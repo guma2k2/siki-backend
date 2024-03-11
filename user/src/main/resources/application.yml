@@ -13,8 +13,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
-
-eureka:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8880/realms/siki
   instance:
     preferIpAddress: true
   client:
