@@ -30,9 +30,10 @@ info:
     name: "users"
     description: "Siki User Application"
     version: "1.0.0"
+
 keycloak:
   auth-server-url: http://localhost:8880
-  realm: siki
-  resource: admin-cli
+  realm: 'siki'
+  resource: 'admin-cli'
   credentials:
     secret: ZOn1oJbVjDKCBwZvJvE5JkjZXQhnxELd
