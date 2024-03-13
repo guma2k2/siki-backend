@@ -1,6 +1,5 @@
 package com.siki.user.service;
 
-import com.siki.user.config.KeycloakPropsConfig;
 import com.siki.user.dto.CustomerPostDto;
 import com.siki.user.dto.UserDto;
 import jakarta.ws.rs.ForbiddenException;
@@ -13,6 +12,7 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -22,20 +22,21 @@ import java.util.Objects;
 @Slf4j
 public class UserService {
     private final Keycloak keycloak;
-    private final KeycloakPropsConfig keycloakPropsConfig;
+    @Value("${keycloak.realm}")
+    private String realm;
     private final static String CUSTOMER = "CUSTOMER";
 
-    public UserService(Keycloak keycloak, KeycloakPropsConfig keycloakPropsConfig) {
+    public UserService(Keycloak keycloak) {
         this.keycloak = keycloak;
-        this.keycloakPropsConfig = keycloakPropsConfig;
     }
 
     public UserDto createCustomer (
             CustomerPostDto customerPostDto
     ) {
        try {
+//           log.info(realm);
            // Todo: check email is existed
-           RealmResource resource = keycloak.realm(keycloakPropsConfig.getRealm());
+           RealmResource resource = keycloak.realm(realm);
            CredentialRepresentation credential = createPasswordCredentials(customerPostDto.password());
            UserRepresentation user = new UserRepresentation();
            user.setFirstName(customerPostDto.firstName());
