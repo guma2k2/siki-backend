@@ -1,7 +1,11 @@
 package com.siki.user.service;
 
 import com.siki.user.dto.CustomerPostDto;
+import com.siki.user.dto.CustomerProfileRequest;
 import com.siki.user.dto.UserDto;
+import com.siki.user.exception.AccessDeniedException;
+import com.siki.user.utils.Constants;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +17,7 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -24,6 +29,9 @@ public class UserService {
     private final Keycloak keycloak;
     @Value("${keycloak.realm}")
     private String realm;
+
+    @Value("${keycloak.resource}")
+    private String adminClientId;
     private final static String CUSTOMER = "CUSTOMER";
 
     public UserService(Keycloak keycloak) {
@@ -74,4 +82,39 @@ public class UserService {
         return passwordCredentials;
     }
 
+    public UserDto getCustomerProfile(String customerId) {
+        try {
+            UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
+            return UserDto.fromUserRepresentation(userRepresentation);
+        }catch (ForbiddenException ex) {
+            throw new AccessDeniedException(String.format(Constants.ERROR_CODE.ACCESS_DENIED_ERROR_FORMAT,
+                    ex.getMessage(), adminClientId));
+        }
+    }
+
+    public UserDto updateCustomer(CustomerProfileRequest customerProfileRequest) {
+        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
+        if (userRepresentation != null) {
+            RealmResource resource = keycloak.realm(realm);
+            UserResource userResource = resource.users().get(customerId);
+
+            userRepresentation.setFirstName(customerProfileRequest.firstName());
+            userRepresentation.setLastName(customerProfileRequest.lastName());
+            userRepresentation.setEmail(customerProfileRequest.email());
+
+            if (customerProfileRequest.password() != null) {
+                userRepresentation.setCredentials(Collections.singletonList(createPasswordCredentials(customerProfileRequest.password())));
+            }
+            try {
+                userResource.update(userRepresentation);
+            }catch (BadRequestException ex) {
+                log.error(ex.toString());
+                log.error(ex.getMessage());
+            }
+            return UserDto.fromUserRepresentation(userRepresentation);
+        }  else {
+            throw new RuntimeException();
+        }
+    }
 }

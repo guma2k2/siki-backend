@@ -1,6 +1,7 @@
 package com.siki.user.controller;
 
 import com.siki.user.dto.CustomerPostDto;
+import com.siki.user.dto.CustomerProfileRequest;
 import com.siki.user.dto.UserDto;
 import com.siki.user.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,21 @@ public class UserController {
         return"User service " + name;
     }
 
+    @GetMapping("/storefront/customer/profile")
+    public ResponseEntity<UserDto> getCustomerProfile() {
+        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserDto userDto = userService.getCustomerProfile(customerId);
+        return ResponseEntity.ok().body(userDto);
+    }
+
     @PostMapping("/storefront/customer")
     public ResponseEntity<UserDto> createCustomer (@RequestBody CustomerPostDto customerPostDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createCustomer(customerPostDto));
     }
+
+    @PutMapping("/storefront/customer")
+    public ResponseEntity<UserDto> updateCustomer (@RequestBody CustomerProfileRequest customerProfileRequest) {
+        return ResponseEntity.ok().body(userService.updateCustomer(customerProfileRequest));
+    }
+
 }
