@@ -25,6 +25,13 @@ public class GatewayserverApplication {
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://USER")
-				).build();
+				).route(p -> p
+						.path("/siki/products/**")
+						.filters(f -> f.rewritePath("/siki/products/(?<segment>.*)","/${segment}")
+								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
+						)
+						.uri("lb://PRODUCT")
+				)
+				.build();
 	}
 }

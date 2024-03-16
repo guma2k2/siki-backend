@@ -1,23 +1,21 @@
-package com.siki.user.config;
+package com.siki.product.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.core.convert.converter.Converter;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 @Configuration
 public class SecurityConfig {
     @Bean
@@ -27,8 +25,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus", "/actuator/health/**",
                                 "/swagger-ui", "/swagger-ui/**", "/error", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/api/storefront/customer").hasRole("CUSTOMER")
-                        .requestMatchers("/api/storefront/customer/profile").hasRole("CUSTOMER")
                         .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .csrf(AbstractHttpConfigurer::disable)
