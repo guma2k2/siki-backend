@@ -27,10 +27,17 @@ public class Category {
     @Builder.Default
     private boolean status = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> childrenList = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductCategory> productCategoryList = new ArrayList<>();
+
+
+
 }
