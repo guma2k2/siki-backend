@@ -1,4 +1,5 @@
-package com.siki.product.dto;
+package com.siki.media.dto;
+
 
 import java.util.ArrayList;
 import java.util.List;

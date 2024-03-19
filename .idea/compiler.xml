@@ -10,6 +10,7 @@
         <module name="eurekaserver" />
         <module name="gatewayserver" />
         <module name="product" />
+        <module name="media" />
         <module name="user" />
       </profile>
     </annotationProcessing>
@@ -18,7 +19,8 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="eurekaserver" options="-parameters" />
       <module name="gatewayserver" options="-parameters" />
-      <module name="product" options="-parameters" />
+      <module name="media" options="-parameters" />
+      <module name="product" options="" />
       <module name="user" options="-parameters" />
     </option>
   </component>
