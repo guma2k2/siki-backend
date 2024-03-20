@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api")
 @RestController
 public class UserController {
 
@@ -19,7 +18,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public String helloWorld() {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return"User service " + name;
