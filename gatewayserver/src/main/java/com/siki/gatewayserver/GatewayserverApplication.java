@@ -20,17 +20,23 @@ public class GatewayserverApplication {
 	public RouteLocator sikiRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
 				.route(p -> p
-						.path("/siki/users/**")
-						.filters(f -> f.rewritePath("/siki/users/(?<segment>.*)","/${segment}")
+						.path("/api/users/**")
+						.filters(f -> f.rewritePath("/api/users/(?<segment>.*)","/${segment}")
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://USER")
 				).route(p -> p
-						.path("/siki/products/**")
-						.filters(f -> f.rewritePath("/siki/products/(?<segment>.*)","/${segment}")
+						.path("/api/products/**")
+						.filters(f -> f.rewritePath("/api/products/(?<segment>.*)","/${segment}")
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://PRODUCT")
+				).route(p -> p
+						.path("/api/medias/**")
+						.filters(f -> f.rewritePath("/api/medias/(?<segment>.*)","/${segment}")
+								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
+						)
+						.uri("lb://MEDIA")
 				)
 				.build();
 	}

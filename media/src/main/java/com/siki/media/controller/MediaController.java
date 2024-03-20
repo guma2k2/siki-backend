@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api")
 @Slf4j
 public class MediaController {
 
@@ -18,14 +17,14 @@ public class MediaController {
         this.mediaService = mediaService;
     }
 
-    @PostMapping("/medias")
+    @PostMapping()
     public ResponseEntity<Media> save (@RequestParam("file") MultipartFile multipartFile,
                                        @RequestParam("type") String type) {
         Media media = mediaService.saveOrUpdateFile(multipartFile, "", type);
         return ResponseEntity.ok().body(media);
     }
 
-    @PutMapping("/medias/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Media> update (@RequestParam("file")MultipartFile multipartFile,
                                          @PathVariable("id") String id,
                                          @PathVariable("type") String type) {
@@ -33,13 +32,13 @@ public class MediaController {
         return ResponseEntity.ok().body(media);
     }
 
-    @GetMapping("/medias/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<String> get (@PathVariable("id") String id) {
         String url = mediaService.getUrlById(id);
         return ResponseEntity.ok().body(url);
     }
 
-    @DeleteMapping("/medias/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete (@PathVariable("id") String id) {
         mediaService.deleteFile(id);
         return ResponseEntity.noContent().build();
