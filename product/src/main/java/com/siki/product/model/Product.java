@@ -30,7 +30,7 @@ public class Product {
 
     private boolean status;
 
-    private Long storeId;
+    private Integer storeId;
 
     private Double price;
 
