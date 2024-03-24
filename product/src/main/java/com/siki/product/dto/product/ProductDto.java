@@ -10,15 +10,9 @@ import java.util.List;
 public record ProductDto (
          Long id,
          String name,
-
          String description,
-
-         int quantity,
-
          boolean status,
-
          StoreDto storeDto,
-         Double price,
          BrandDto brandDto,
          List<ProductImageDto> productImages
 ) {
@@ -27,10 +21,8 @@ public record ProductDto (
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
-                product.getQuantity(),
                 product.isStatus(),
                 storeDto,
-                product.getPrice(),
                 brandDto,
                 productImages
                 );

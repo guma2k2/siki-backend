@@ -26,26 +26,27 @@ public class Product {
     @Column(length = 512)
     private String description;
 
-    private int quantity;
 
     private boolean status;
 
     private Integer storeId;
 
-    private Double price;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductCategory> productCategories = new ArrayList<>();
 
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST})
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductImage> productImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductVariation> productVariations = new ArrayList<>();
 
 
 }
