@@ -21,34 +21,21 @@ public class ProductServiceImpl implements ProductService {
     private final BrandRepository brandRepository;
 
     private final CategoryRepository categoryRepository;
+    private final ProductVariationRepository productVariationRepository;
+    private final ProductAttributeRepository productAttributeRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository) {
+    private final ProductAttributeValueRepository productAttributeValueRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
+        this.productVariationRepository = productVariationRepository;
+        this.productAttributeRepository = productAttributeRepository;
+        this.productAttributeValueRepository = productAttributeValueRepository;
     }
 
-    @Override
-    public Long create(ProductPostDto productPostDto) {
-        if (checkExistedProductByName(productPostDto.name(), null)) {
-            throw new DuplicatedException(Constants.ERROR_CODE.PRODUCT_NAME_IS_EXISTED, productPostDto.name());
-        }
-        Product product = Product.builder()
-                .name(productPostDto.name())
-                .description(productPostDto.description())
-                .quantity(productPostDto.quantity())
-                .status(productPostDto.status())
-                .storeId(productPostDto.storeId())
-                .price(productPostDto.price())
-                .build();
-
-        Product savedProduct = productRepository.saveAndFlush(product);
-        setBrand(product, productPostDto.brandId());
-        setProductImages(product, productPostDto.productImages());
-        setProductCategories(product, productPostDto.productCategories());
-        return savedProduct.getId();
-    }
 
     private void setProductCategories(Product product, List<Integer> productCategories) {
         List<ProductCategory> productCategoryList = new ArrayList<>();
@@ -82,8 +69,48 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
     }
 
-    private boolean checkExistedProductByName(String name, Long id) {
-        return productRepository.findExistedName(name, id) != null;
+
+    @Override
+    public void create(List<ProductPostDto> productPostDtos) {
+        productPostDtos.forEach(productDto -> {
+            Product product = Product.builder()
+                    .name(productDto.name())
+                    .description(productDto.description())
+                    .quantity(productDto.quantity())
+                    .price(productDto.price())
+                    .storeId(productDto.storeId())
+                    .build();
+
+            productRepository.saveAndFlush(product);
+            setBrand(product, productDto.brandId());
+            setProductCategories(product, productDto.productCategoryIds());
+            setProductImages(product, productDto.productImageIds());
+            setProductAttribute(product, productDto.productAttributeIds());
+            setProductVariation(product, productDto.productOptionValueIds());
+        });
+    }
+
+    private void setProductVariation(Product product, List<Long> productAttributeValueIds) {
+        List<ProductVariation> productVariations = new ArrayList<>();
+        productAttributeValueIds.forEach(attributeValueId -> {
+            ProductAttributeValue productAttributeValue = productAttributeValueRepository.findById(attributeValueId).orElseThrow();
+            ProductVariation productVariation =
+                    ProductVariation.builder()
+                            .product(product)
+                            .productAttributeValue(productAttributeValue)
+                            .build();
+            productVariations.add(productVariation);
+        } );
+        productVariationRepository.saveAllAndFlush(productVariations);
+    }
+
+    private void setProductAttribute(Product product, List<Long> attributes) {
+        List<ProductAttribute> productAttributes = new ArrayList<>();
+        attributes.forEach((attributeId) -> {
+            ProductAttribute productAttribute = productAttributeRepository.findById(attributeId).orElseThrow();
+            productAttributes.add(productAttribute);
+        });
+        productAttributeRepository.saveAllAndFlush(productAttributes);
     }
 
     @Override

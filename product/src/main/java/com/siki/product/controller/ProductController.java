@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ProductController {
 
@@ -31,14 +33,13 @@ public class ProductController {
         return ResponseEntity.ok(productService.getById(id));
     }
 
-    @PostMapping("/backoffice/products")
+   @PostMapping("/backoffice/products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
-    public ResponseEntity<ProductDto> createBrand(@Valid @RequestBody ProductPostDto productPostDto) {
-        Long savedProductId = productService.create(productPostDto);
-        ProductDto productDto = productService.getById(savedProductId);
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productDto);
+    public ResponseEntity<Void> createBrand(@Valid @RequestBody List<ProductPostDto> productPostDto) {
+       productService.create(productPostDto);
+        return ResponseEntity.noContent().build();
 
     }
 

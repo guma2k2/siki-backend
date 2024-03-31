@@ -14,17 +14,13 @@ public class ProductVariation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private Product product;
+    private Product product ;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_option_value_id")
-    private ProductOptionValue productOptionValue;
-
-    private int quantity;
-
-    private Double price;
+    @JoinColumn(name = "product_attribute_value_id")
+    private ProductAttributeValue productAttributeValue;
 }

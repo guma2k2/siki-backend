@@ -3,10 +3,11 @@ package com.siki.product.service;
 import com.siki.product.dto.product.ProductDto;
 import com.siki.product.dto.product.ProductPostDto;
 
-public interface ProductService {
-    // Todo: save product, get product by id
+import java.util.List;
 
-    Long create(ProductPostDto productPostDto);
+public interface ProductService {
+
+    void create(List<ProductPostDto> productPostDtos);
     ProductDto getById(Long productId);
 
 }
