@@ -6,12 +6,14 @@ public record ProductPostDto (
         Long id,
         String name,
         String description,
-        int quantity,
         boolean status,
         Integer storeId,
-        Double price,
         Integer brandId,
-        List<ProductImageDto> productImages,
-        List<Integer> productCategories
+        int quantity,
+        Double price,
+        List<ProductImageDto> productImageIds,
+        List<Integer> productCategoryIds,
+        List<Long> productAttributeIds,
+        List<Long> productOptionValueIds
 ) {
 }

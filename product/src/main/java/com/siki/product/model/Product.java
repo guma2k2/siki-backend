@@ -19,13 +19,16 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 128, unique = true, nullable = false)
+    @Column(length = 128, nullable = false)
 
     private String name;
 
     @Column(length = 512)
     private String description;
 
+    private int quantity;
+
+    private Double price;
 
     private boolean status;
 
@@ -43,6 +46,11 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductImage> productImages = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductAttribute> productAttributes = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
