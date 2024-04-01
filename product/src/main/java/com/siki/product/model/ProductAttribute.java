@@ -20,11 +20,11 @@ public class ProductAttribute {
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
     @OneToMany(mappedBy = "product_attribute", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_attribute_set_id")
+    private ProductAttributeSet productAttributeSet;
 }

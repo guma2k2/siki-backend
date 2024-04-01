@@ -47,10 +47,9 @@ public class Product {
     @Builder.Default
     private List<ProductImage> productImages = new ArrayList<>();
 
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<ProductAttribute> productAttributes = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_attribute_set_id")
+    private ProductAttributeSet productAttributeSet;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
