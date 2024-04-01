@@ -13,7 +13,7 @@ public record ProductPostDto (
         Double price,
         List<ProductImageDto> productImageIds,
         List<Integer> productCategoryIds,
-        List<Long> productAttributeIds,
+        Integer productAttributeSetId,
         List<Long> productOptionValueIds
 ) {
 }

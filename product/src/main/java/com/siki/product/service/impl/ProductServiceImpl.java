@@ -17,6 +17,8 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+
+    private final ProductAttributeSetRepository productAttributeSetRepository;
     private final ProductImageRepository productImageRepository;
     private final BrandRepository brandRepository;
 
@@ -26,8 +28,9 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductAttributeValueRepository productAttributeValueRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductAttributeSetRepository productAttributeSetRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository) {
         this.productRepository = productRepository;
+        this.productAttributeSetRepository = productAttributeSetRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
@@ -83,11 +86,17 @@ public class ProductServiceImpl implements ProductService {
 
             productRepository.saveAndFlush(product);
             setBrand(product, productDto.brandId());
+            setProductAttributeSet(product, productDto.productAttributeSetId());
             setProductCategories(product, productDto.productCategoryIds());
             setProductImages(product, productDto.productImageIds());
-            setProductAttribute(product, productDto.productAttributeIds());
             setProductVariation(product, productDto.productOptionValueIds());
         });
+    }
+
+    private void setProductAttributeSet(Product product, Integer productAttributeSetId) {
+        ProductAttributeSet productAttributeSet = productAttributeSetRepository.findById(productAttributeSetId).orElseThrow();
+        product.setProductAttributeSet(productAttributeSet);
+
     }
 
     private void setProductVariation(Product product, List<Long> productAttributeValueIds) {
@@ -104,14 +113,7 @@ public class ProductServiceImpl implements ProductService {
         productVariationRepository.saveAllAndFlush(productVariations);
     }
 
-    private void setProductAttribute(Product product, List<Long> attributes) {
-        List<ProductAttribute> productAttributes = new ArrayList<>();
-        attributes.forEach((attributeId) -> {
-            ProductAttribute productAttribute = productAttributeRepository.findById(attributeId).orElseThrow();
-            productAttributes.add(productAttribute);
-        });
-        productAttributeRepository.saveAllAndFlush(productAttributes);
-    }
+
 
     @Override
     public ProductDto getById(Long productId) {
