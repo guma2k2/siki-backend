@@ -60,4 +60,10 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         ProductAttributeSetDto productAttributeSetDto = ProductAttributeSetDto.fromModel(productAttributeSet, target);
         return productAttributeSetDto;
     }
+
+    @Override
+    public ProductAttributeDto getById(Long id) {
+        ProductAttribute productAttribute = productAttributeRepository.get(id).orElseThrow();
+        return ProductAttributeDto.fromModel(productAttribute);
+    }
 }
