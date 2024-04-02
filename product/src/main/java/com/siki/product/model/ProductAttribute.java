@@ -24,7 +24,7 @@ public class ProductAttribute {
     @Builder.Default
     private List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "product_attribute_set_id")
     private ProductAttributeSet productAttributeSet;
 }

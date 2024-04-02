@@ -32,6 +32,8 @@ public class Product {
 
     private boolean status;
 
+    private boolean showIndividually;
+
     private Integer storeId;
 
     @ManyToOne(fetch = FetchType.LAZY)

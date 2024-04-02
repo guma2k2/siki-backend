@@ -37,10 +37,9 @@ public class ProductController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
-    public ResponseEntity<Void> createBrand(@Valid @RequestBody List<ProductPostDto> productPostDto) {
-       productService.create(productPostDto);
+    public ResponseEntity<Void> createProduct(@Valid @RequestBody List<ProductPostDto> productPostDto) {
+        productService.create(productPostDto);
         return ResponseEntity.noContent().build();
-
     }
 
 }

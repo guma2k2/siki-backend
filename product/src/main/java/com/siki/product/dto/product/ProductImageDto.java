@@ -4,14 +4,14 @@ import com.siki.product.model.ProductImage;
 
 public record ProductImageDto (
         Long id,
-        String urlPath,
+        String url,
         boolean isDefault
 ) {
 
     public static ProductImageDto fromModel(ProductImage productImage) {
         return new ProductImageDto(
                 productImage.getId(),
-                productImage.getUrlPath(),
+                productImage.getUrl(),
                 productImage.isDefault()
         );
     }

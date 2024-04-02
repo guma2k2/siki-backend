@@ -12,4 +12,13 @@ import java.util.Optional;
 @Repository
 public interface ProductAttributeRepository extends JpaRepository<ProductAttribute, Long> {
 
+
+    @Query("""
+            select pa
+            from ProductAttribute pa
+            join fetch pa.productAttributeValues
+            where pa.id = :id
+            """)
+    Optional<ProductAttribute> get(@Param("id") Long id);
+
 }

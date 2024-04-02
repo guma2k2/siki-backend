@@ -9,4 +9,6 @@ import java.util.List;
 public interface ProductAttributeService {
     ProductAttributeSetDto save(List<ProductAttributePostDto> productAttributePostDtoList,
                                 String attribute_set_name);
+
+    ProductAttributeDto getById(Long id);
 }

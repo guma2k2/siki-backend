@@ -6,6 +6,7 @@ import com.siki.product.dto.product.*;
 import com.siki.product.exception.*;
 import com.siki.product.model.*;
 import com.siki.product.repository.*;
+import com.siki.product.service.ProductAttributeSetService;
 import com.siki.product.service.ProductService;
 import com.siki.product.utils.Constants;
 import org.springframework.stereotype.Service;
@@ -24,18 +25,17 @@ public class ProductServiceImpl implements ProductService {
 
     private final CategoryRepository categoryRepository;
     private final ProductVariationRepository productVariationRepository;
-    private final ProductAttributeRepository productAttributeRepository;
-
+    private final ProductAttributeSetService productAttributeSetService;
     private final ProductAttributeValueRepository productAttributeValueRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductAttributeSetRepository productAttributeSetRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductAttributeSetRepository productAttributeSetRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeSetService productAttributeSetService, ProductAttributeValueRepository productAttributeValueRepository) {
         this.productRepository = productRepository;
         this.productAttributeSetRepository = productAttributeSetRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
         this.categoryRepository = categoryRepository;
         this.productVariationRepository = productVariationRepository;
-        this.productAttributeRepository = productAttributeRepository;
+        this.productAttributeSetService = productAttributeSetService;
         this.productAttributeValueRepository = productAttributeValueRepository;
     }
 
@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductImage> productImageList = new ArrayList<>();
         for(ProductImageDto productImage: productImages) {
             ProductImage newProductImage = ProductImage.builder()
-                    .urlPath(productImage.urlPath())
+                    .url(productImage.url())
                     .isDefault(productImage.isDefault())
                     .product(product)
                     .build();
@@ -120,10 +120,18 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByIdCustom(productId)
                 .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.PRODUCT_NOT_FOUND, productId));
         BrandDto brandDto = BrandDto.fromModel(product.getBrand());
-        StoreDto storeDto = null    ;
+        // Todo: get store by id in user service
+        StoreDto storeDto = null;
+
         List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> ProductImageDto.fromModel(productImage)).toList();
 
-        // get store from user service
-        return ProductDto.fromModel(product, storeDto, brandDto, productImageDtos);
+        ProductAttributeSetDto productAttributeSetDto = productAttributeSetService.findById(product.getProductAttributeSet().getId());
+
+        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
+
+        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> productVariation.getProductAttributeValue()).toList();
+        List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> ProductAttributeValueDto.fromModel(productAttributeValue)).toList();
+
+        return ProductDto.fromModel(product, storeDto, brandDto, productImageDtos, productAttributeSetDto, productAttributeValueDtos);
     }
 }
