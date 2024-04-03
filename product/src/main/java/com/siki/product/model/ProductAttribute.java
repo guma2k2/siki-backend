@@ -14,13 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ProductAttribute {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    @OneToMany(mappedBy = "product_attribute", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "productAttribute", cascade = CascadeType.PERSIST)
     @Builder.Default
     private List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
 

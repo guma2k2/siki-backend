@@ -18,7 +18,18 @@ public class ProductAttributeSet {
     private Integer id;
     private String name;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "productAttributeSet", cascade = CascadeType.PERSIST)
     @Builder.Default
     private List<ProductAttribute> productAttributes = new ArrayList<>();
+
+    public void addAttribute(ProductAttribute attribute) {
+        productAttributes.add(attribute);
+        attribute.setProductAttributeSet(this);
+    }
+
+    public void addListAttribute(List<ProductAttribute> attributes) {
+        if (!attributes.isEmpty()) {
+            attributes.forEach(this::addAttribute);
+        }
+    }
 }

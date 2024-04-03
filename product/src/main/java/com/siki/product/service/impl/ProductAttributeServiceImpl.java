@@ -3,6 +3,7 @@ package com.siki.product.service.impl;
 import com.siki.product.dto.product.ProductAttributeDto;
 import com.siki.product.dto.product.ProductAttributePostDto;
 import com.siki.product.dto.product.ProductAttributeSetDto;
+import com.siki.product.dto.product.ProductAttributeSetPostDto;
 import com.siki.product.model.ProductAttribute;
 import com.siki.product.model.ProductAttributeSet;
 import com.siki.product.model.ProductAttributeValue;
@@ -11,6 +12,7 @@ import com.siki.product.repository.ProductAttributeSetRepository;
 import com.siki.product.repository.ProductAttributeValueRepository;
 import com.siki.product.service.ProductAttributeService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +29,17 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         this.productAttributeSetRepository = productAttributeSetRepository;
     }
 
+    @Transactional
     @Override
-    public ProductAttributeSetDto save(List<ProductAttributePostDto> productAttributePostDtoList,
-                                          String attribute_set_name) {
+    public ProductAttributeSetDto save(ProductAttributeSetPostDto productAttributeSetPostDto) {
+        // Create and save the ProductAttributeSet
         ProductAttributeSet productAttributeSet = ProductAttributeSet.builder()
-                .name(attribute_set_name)
+                .name(productAttributeSetPostDto.attribute_set_name())
                 .build();
         productAttributeSetRepository.saveAndFlush(productAttributeSet);
         List<ProductAttribute> attributes = new ArrayList<>();
         List<ProductAttributeDto> target = new ArrayList<>();
-        productAttributePostDtoList.forEach(productAttributePostDto -> {
+        productAttributeSetPostDto.productAttributePostDtoList().forEach(productAttributePostDto -> {
             ProductAttribute productAttribute = ProductAttribute.builder()
                     .name(productAttributePostDto.name())
                     .productAttributeSet(productAttributeSet)
@@ -61,9 +64,11 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
         return productAttributeSetDto;
     }
 
+
     @Override
     public ProductAttributeDto getById(Long id) {
-        ProductAttribute productAttribute = productAttributeRepository.get(id).orElseThrow();
-        return ProductAttributeDto.fromModel(productAttribute);
+//        ProductAttribute productAttribute = productAttributeRepository.get(id).orElseThrow();
+//        return ProductAttributeDto.fromModel(productAttribute);
+        return null;
     }
 }

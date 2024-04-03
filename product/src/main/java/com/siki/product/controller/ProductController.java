@@ -24,7 +24,6 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // create product
     @GetMapping("/backoffice/products/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
@@ -33,7 +32,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getById(id));
     }
 
-   @PostMapping("/backoffice/products")
+    @PostMapping("/backoffice/products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})

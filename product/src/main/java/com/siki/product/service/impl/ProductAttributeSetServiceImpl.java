@@ -6,9 +6,10 @@ import com.siki.product.model.ProductAttribute;
 import com.siki.product.model.ProductAttributeSet;
 import com.siki.product.repository.ProductAttributeSetRepository;
 import com.siki.product.service.ProductAttributeSetService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class ProductAttributeSetServiceImpl implements ProductAttributeSetService {
 
     private final ProductAttributeSetRepository productAttributeSetRepository;

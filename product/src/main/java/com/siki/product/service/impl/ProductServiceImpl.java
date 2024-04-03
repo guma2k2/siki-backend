@@ -40,17 +40,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    private void setProductCategories(Product product, List<Integer> productCategories) {
-        List<ProductCategory> productCategoryList = new ArrayList<>();
-        for(Integer categoryId : productCategories){
-            Category category = categoryRepository.findById(categoryId).orElseThrow(()->new NotFoundException(Constants.ERROR_CODE.CATEGORY_NOT_FOUND, categoryId));
-            ProductCategory productCategory = ProductCategory.builder()
-                    .product(product)
-                    .category(category)
-                    .build();
-            productCategoryList.add(productCategory);
-        }
-        product.setProductCategories(productCategoryList);
+    private void setProductCategory(Product product, Integer categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        product.setCategory(category);
     }
 
     private void setProductImages(Product product, List<ProductImageDto> productImages) {
@@ -87,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
             productRepository.saveAndFlush(product);
             setBrand(product, productDto.brandId());
             setProductAttributeSet(product, productDto.productAttributeSetId());
-            setProductCategories(product, productDto.productCategoryIds());
+            setProductCategory(product, productDto.categoryId());
             setProductImages(product, productDto.productImageIds());
             setProductVariation(product, productDto.productOptionValueIds());
         });

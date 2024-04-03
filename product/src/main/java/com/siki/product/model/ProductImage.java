@@ -19,7 +19,6 @@ public class ProductImage {
 
     private boolean isDefault;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
