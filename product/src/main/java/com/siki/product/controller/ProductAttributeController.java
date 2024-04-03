@@ -29,9 +29,8 @@ public class ProductAttributeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ProductAttributePostDto[].class))),
     })
-    public ResponseEntity<ProductAttributeSetDto> createProductAttributes(@Valid @RequestBody List<ProductAttributePostDto> productAttributePostDtoList,
-                                                                          @RequestParam("attribute_set_name") String attribute_set_name) {
-        ProductAttributeSetDto productAttributeSetDto = productAttributeService.save(productAttributePostDtoList, attribute_set_name);
+    public ResponseEntity<ProductAttributeSetDto> createProductAttributes(@Valid @RequestBody ProductAttributeSetPostDto productAttributeSetPostDto) {
+        ProductAttributeSetDto productAttributeSetDto = productAttributeService.save(productAttributeSetPostDto);
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productAttributeSetDto);
     }
 }
