@@ -21,7 +21,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("""
             select p
             from Product p
-            left join fetch p.productImages
             left join fetch p.brand
             left join fetch p.category
             left join fetch p.productAttributeSet
@@ -29,4 +28,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where p.id = :id
             """)
     Optional<Product> findByIdCustom(@Param("id") Long id);
+
+    @Query(value = """
+            select p
+            from Product p
+            left join fetch p.productImages
+            where p = :product
+            """)
+    Optional<Product> findByProduct(@Param("product") Product product);
 }

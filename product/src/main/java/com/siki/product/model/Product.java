@@ -58,4 +58,8 @@ public class Product {
     private List<ProductVariation> productVariations = new ArrayList<>();
 
 
+//    public void addVariation(ProductVariation productVariation) {
+//        productVariations.add(productVariation);
+//        productVariation.setProduct(this);
+//    }
 }

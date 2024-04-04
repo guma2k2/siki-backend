@@ -9,6 +9,7 @@ public record ProductPostDto (
         boolean status,
         Integer storeId,
         Integer brandId,
+        boolean isShowIndividually,
         int quantity,
         Double price,
         List<ProductImageDto> productImageIds,

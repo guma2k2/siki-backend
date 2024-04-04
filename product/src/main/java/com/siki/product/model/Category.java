@@ -38,6 +38,8 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> productList = new ArrayList<>();
 
-
+    public boolean hasParent() {
+        return this.parent != null;
+    }
 
 }
