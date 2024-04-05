@@ -4,10 +4,11 @@ import com.siki.product.model.ProductAttributeValue;
 
 public record ProductAttributeValueDto(
         Long id,
-        String value
+        String value,
+        Long attributeId
 ) {
 
     public static  ProductAttributeValueDto fromModel(ProductAttributeValue productAttributeValue) {
-        return new ProductAttributeValueDto(productAttributeValue.getId(), productAttributeValue.getValue());
+        return new ProductAttributeValueDto(productAttributeValue.getId(), productAttributeValue.getValue(), productAttributeValue.getProductAttribute().getId());
     }
 }

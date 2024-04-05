@@ -13,18 +13,19 @@ public record ProductDto (
          String description,
          boolean status,
          int quantity,
-
          Double price,
          boolean isShowIndividually,
          StoreDto storeDto,
          BrandDto brandDto,
          List<ProductImageDto> productImages,
          ProductAttributeSetDto productAttributeSet,
-         List<ProductAttributeValueDto> productVariations
+         List<ProductAttributeValueDto> productAttributeValues,
+         List<ProductVariantDto> productVariants
 ) {
     public static ProductDto fromModel(Product product, StoreDto storeDto, BrandDto brandDto, List<ProductImageDto> productImages,
                                        ProductAttributeSetDto productAttributeSet,
-                                       List<ProductAttributeValueDto> productVariations
+                                       List<ProductAttributeValueDto> productVariations,
+                                       List<ProductVariantDto> productVariants
                                        ) {
         return new ProductDto(
                 product.getId(),
@@ -38,7 +39,8 @@ public record ProductDto (
                 brandDto,
                 productImages,
                 productAttributeSet,
-                productVariations
-                );
+                productVariations,
+                productVariants
+        );
     }
 }

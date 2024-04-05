@@ -16,7 +16,8 @@ public interface ProductVariationRepository extends JpaRepository<ProductVariati
             select pv
             from ProductVariation pv
             left join fetch pv.product pvp
-            left join fetch pv.productAttributeValue
+            left join fetch pv.productAttributeValue pav
+            left join fetch pav.productAttribute
             where pvp.id = :productId
             """)
     List<ProductVariation> findByProductId(@Param("productId") Long productId);
