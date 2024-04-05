@@ -60,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
             setProductAttributeSet(product, productDto.productAttributeSetId());
             setProductCategory(product, productDto.categoryId());
             setProductImages(product, productDto.productImageIds());
-            setProductVariation(product, productDto.productOptionValueIds());
+            setProductAttributeValues(product, productDto.productOptionValueIds());
         });
     }
 
@@ -70,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    private void setProductVariation(Product product, List<Long> productAttributeValueIds) {
+    private void setProductAttributeValues(Product product, List<Long> productAttributeValueIds) {
         List<ProductVariation> productVariations = new ArrayList<>();
         productAttributeValueIds.forEach(attributeValueId -> {
             ProductAttributeValue productAttributeValue = productAttributeValueRepository.findById(attributeValueId).orElseThrow();
@@ -93,12 +93,27 @@ public class ProductServiceImpl implements ProductService {
         StoreDto storeDto = null;
         List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> ProductImageDto.fromModel(productImage)).toList();
         ProductAttributeSetDto productAttributeSetDto = productAttributeSetService.findById(product.getProductAttributeSet().getId());
-        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
 
+        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
         List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> productVariation.getProductAttributeValue()).toList();
         List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> ProductAttributeValueDto.fromModel(productAttributeValue)).toList();
 
-        return ProductDto.fromModel(product, storeDto, brandDto, productImageDtos, productAttributeSetDto, productAttributeValueDtos);
+        Integer productAttributeSetId = product.getProductAttributeSet().getId();
+        List<ProductVariantDto> productVariants = getProductVariants(productAttributeSetId, product);
+        return ProductDto.fromModel(product, storeDto, brandDto, productImageDtos, productAttributeSetDto, productAttributeValueDtos, productVariants);
+    }
+
+    private List<ProductVariantDto> getProductVariants(Integer productAttributeSetId, Product baseProduct) {
+        List<Product> products = productRepository.findByAttributeSetId(productAttributeSetId, baseProduct);
+        products = productRepository.findByAttributeSetIdReturnImages(products, baseProduct);
+        List<ProductVariantDto> target = products.stream().map(product -> {
+            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> ProductImageDto.fromModel(productImage)).toList();
+            List<ProductVariation> productVariations = productVariationRepository.findByProductId(product.getId());
+            List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> productVariation.getProductAttributeValue()).toList();
+            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> ProductAttributeValueDto.fromModel(productAttributeValue)).toList();
+            return ProductVariantDto.fromModel(product, productImageDtos, productAttributeValueDtos);
+        }).toList();
+        return target;
     }
 
     private void setProductCategory(Product product, Integer categoryId) {
@@ -106,14 +121,14 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
     }
 
-    private String getBreadcrum(Integer categoryId) {
-        String ans = "";
+    private  List<String>  getBreadcrumb(Integer categoryId) {
+        List<String> categoryList = new ArrayList<>();
         Category category = categoryRepository.findById(categoryId).orElseThrow();
         while(category.hasParent()) {
-            ans = ans + "_" + category.getName();
+            categoryList.add(category.getName());
             category = category.getParent();
         }
-        return ans;
+        return categoryList;
     }
 
     private void setProductImages(Product product, List<ProductImageDto> productImages) {

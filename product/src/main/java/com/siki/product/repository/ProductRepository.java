@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,6 +29,25 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where p.id = :id
             """)
     Optional<Product> findByIdCustom(@Param("id") Long id);
+
+
+    @Query("""
+            select p
+            from Product p
+            left join fetch p.productAttributeSet pas
+            left join fetch p.productVariations
+            where pas.id = :attributeSetId AND p != :baseProduct
+            """)
+    List<Product> findByAttributeSetId(@Param("attributeSetId") Integer attributeSetId, @Param("baseProduct") Product baseProduct);
+
+    @Query("""
+            select p
+            from Product p
+            left join fetch p.productImages
+            where p in :products AND p != :baseProduct
+            """)
+    List<Product> findByAttributeSetIdReturnImages(@Param("products") List<Product> products, @Param("baseProduct") Product baseProduct);
+
 
     @Query(value = """
             select p
