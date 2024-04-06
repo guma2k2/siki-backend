@@ -504,6 +504,9 @@
         ],
         "admin-cli": [
           "uma_protection"
+        ],
+        "account": [
+          "manage-account"
         ]
       },
       "notBefore": 0,
