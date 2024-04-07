@@ -1,73 +1,96 @@
 package com.siki.product.service.impl;
 
 import com.siki.product.dto.StoreDto;
-import com.siki.product.dto.brand.BrandDto;
 import com.siki.product.dto.product.*;
 import com.siki.product.exception.*;
 import com.siki.product.model.*;
 import com.siki.product.repository.*;
-import com.siki.product.service.ProductAttributeSetService;
 import com.siki.product.service.ProductService;
 import com.siki.product.utils.Constants;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-
-    private final ProductAttributeSetRepository productAttributeSetRepository;
     private final ProductImageRepository productImageRepository;
     private final BrandRepository brandRepository;
-
+    private final BaseProductRepository baseProductRepository;
     private final CategoryRepository categoryRepository;
     private final ProductVariationRepository productVariationRepository;
-    private final ProductAttributeSetService productAttributeSetService;
     private final ProductAttributeValueRepository productAttributeValueRepository;
+    private final ProductAttributeRepository productAttributeRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductAttributeSetRepository productAttributeSetRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeSetService productAttributeSetService, ProductAttributeValueRepository productAttributeValueRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository) {
         this.productRepository = productRepository;
-        this.productAttributeSetRepository = productAttributeSetRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
+        this.baseProductRepository = baseProductRepository;
         this.categoryRepository = categoryRepository;
         this.productVariationRepository = productVariationRepository;
-        this.productAttributeSetService = productAttributeSetService;
         this.productAttributeValueRepository = productAttributeValueRepository;
+        this.productAttributeRepository = productAttributeRepository;
     }
-
-
-
 
 
     @Override
-    public void create(List<ProductPostDto> productPostDtos) {
-        productPostDtos.forEach(productDto -> {
+    @Transactional
+    public void create(BaseProductPostDto baseProductPostDto) {
+        // Todo : check exist slug
+        BaseProduct baseProduct = BaseProduct.builder()
+                .name(baseProductPostDto.name())
+                .slug(baseProductPostDto.slug())
+                .description(baseProductPostDto.description())
+                .storeId(baseProductPostDto.storeId())
+                .status(false)
+                .build();
+        baseProductRepository.saveAndFlush(baseProduct);
+        setProductAttributes(baseProduct, baseProductPostDto.attributeIds());
+        setBrand(baseProduct, baseProductPostDto.brandId());
+        setProductCategory(baseProduct, baseProductPostDto.categoryId());
+        setProductVariants(baseProduct, baseProductPostDto.productPosts());
+    }
+
+    @Override
+    public BaseProductDto getById(Long baseProductId) {
+        BaseProduct baseProduct = baseProductRepository.findByIdCustom(baseProductId).orElseThrow();
+
+        List<ProductAttribute> productAttributes = productAttributeRepository.findByBaseProductId(baseProductId);
+
+        List<ProductAttributeDto> productAttributeDtos =
+                productAttributes.stream().map(ProductAttributeDto::fromModel).toList();
+        List<ProductDto> productVariants = getProductVariantsById(baseProductId);
+        List<String> breadcrumb = getBreadcrumb(baseProduct.getCategory().getId(), baseProduct.getName());
+        StoreDto storeDto = null;
+        return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
+    }
+
+    private void setProductAttributes(BaseProduct baseProduct, List<Long> attributeIds) {
+        List<ProductAttribute> attributes = productAttributeRepository.findByIds(attributeIds);
+        attributes.forEach(productAttribute -> {
+            productAttribute.setBaseProduct(baseProduct);
+        });
+        productAttributeRepository.saveAllAndFlush(attributes);
+    }
+
+
+    public void setProductVariants(BaseProduct baseProduct, List<ProductPostDto> productPosts) {
+        productPosts.forEach(productDto -> {
             Product product = Product.builder()
-                    .name(productDto.name())
-                    .description(productDto.description())
+                    .status(true)
+                    .baseProduct(baseProduct)
                     .quantity(productDto.quantity())
-                    .showIndividually(productDto.isShowIndividually())
                     .price(productDto.price())
-                    .storeId(productDto.storeId())
                     .build();
-            // Todo: get breadcrumb
             productRepository.saveAndFlush(product);
-            setBrand(product, productDto.brandId());
-            setProductAttributeSet(product, productDto.productAttributeSetId());
-            setProductCategory(product, productDto.categoryId());
             setProductImages(product, productDto.productImageIds());
             setProductAttributeValues(product, productDto.productOptionValueIds());
         });
-    }
-
-    private void setProductAttributeSet(Product product, Integer productAttributeSetId) {
-        ProductAttributeSet productAttributeSet = productAttributeSetRepository.findById(productAttributeSetId).orElseThrow();
-        product.setProductAttributeSet(productAttributeSet);
-
     }
 
     private void setProductAttributeValues(Product product, List<Long> productAttributeValueIds) {
@@ -84,53 +107,37 @@ public class ProductServiceImpl implements ProductService {
         productVariationRepository.saveAllAndFlush(productVariations);
     }
 
-    @Override
-    public ProductDto getById(Long productId) {
-        Product product = productRepository.findByIdCustom(productId)
-                .orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.PRODUCT_NOT_FOUND, productId));
-        product = productRepository.findByProduct(product).orElseThrow();
-        BrandDto brandDto = BrandDto.fromModel(product.getBrand());
-        StoreDto storeDto = null;
-        List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> ProductImageDto.fromModel(productImage)).toList();
-        ProductAttributeSetDto productAttributeSetDto = productAttributeSetService.findById(product.getProductAttributeSet().getId());
 
-        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
-        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> productVariation.getProductAttributeValue()).toList();
-        List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> ProductAttributeValueDto.fromModel(productAttributeValue)).toList();
-
-        Integer productAttributeSetId = product.getProductAttributeSet().getId();
-        List<ProductVariantDto> productVariants = getProductVariants(productAttributeSetId, product);
-        return ProductDto.fromModel(product, storeDto, brandDto, productImageDtos, productAttributeSetDto, productAttributeValueDtos, productVariants);
-    }
-
-    private List<ProductVariantDto> getProductVariants(Integer productAttributeSetId, Product baseProduct) {
-        List<Product> products = productRepository.findByAttributeSetId(productAttributeSetId, baseProduct);
-        products = productRepository.findByAttributeSetIdReturnImages(products, baseProduct);
-        List<ProductVariantDto> target = products.stream().map(product -> {
-            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> ProductImageDto.fromModel(productImage)).toList();
-            List<ProductVariation> productVariations = productVariationRepository.findByProductId(product.getId());
-            List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> productVariation.getProductAttributeValue()).toList();
-            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> ProductAttributeValueDto.fromModel(productAttributeValue)).toList();
-            return ProductVariantDto.fromModel(product, productImageDtos, productAttributeValueDtos);
+    private List<ProductDto> getProductVariantsById(Long baseProductId) {
+        List<Product> products = productRepository.findByBaseProductId(baseProductId);
+        List<ProductDto> target = products.stream().map(product -> {
+            Long productId = product.getId();
+            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(ProductImageDto::fromModel).toList();
+            List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
+            List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
+            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
+            return ProductDto.fromModel(product, productImageDtos, productAttributeValueDtos);
         }).toList();
         return target;
     }
 
-    private void setProductCategory(Product product, Integer categoryId) {
+    private void setProductCategory(BaseProduct baseProduct, Integer categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow();
-        product.setCategory(category);
+        baseProduct.setCategory(category);
     }
-
-    private  List<String>  getBreadcrumb(Integer categoryId) {
+    private  List<String>  getBreadcrumb(Integer categoryId, String productName) {
         List<String> categoryList = new ArrayList<>();
-        Category category = categoryRepository.findById(categoryId).orElseThrow();
+        Category category = categoryRepository.findByIdCustom(categoryId).orElseThrow();
         while(category.hasParent()) {
             categoryList.add(category.getName());
-            category = category.getParent();
+            category = categoryRepository.findByIdCustom(category.getParent().getId()).orElseThrow();
         }
+        categoryList.add(category.getName());
+        Collections.reverse(categoryList);
+        categoryList.add(0, "Trang chủ");
+        categoryList.add(productName);
         return categoryList;
     }
-
     private void setProductImages(Product product, List<ProductImageDto> productImages) {
         List<ProductImage> productImageList = new ArrayList<>();
         if (productImages != null && productImages.size() > 0) {
@@ -146,9 +153,8 @@ public class ProductServiceImpl implements ProductService {
             product.setProductImages(productImageList);
         }
     }
-
-    private void setBrand(Product product, Integer brandId) {
+    private void setBrand(BaseProduct baseProduct, Integer brandId) {
         Brand brand = brandRepository.findById(brandId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.BRAND_NOT_FOUND, brandId));
-        product.setBrand(brand);
+        baseProduct.setBrand(brand);
     }
 }
