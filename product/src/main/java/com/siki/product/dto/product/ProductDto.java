@@ -9,38 +9,25 @@ import java.util.List;
 
 public record ProductDto (
          Long id,
-         String name,
-         String description,
          boolean status,
          int quantity,
          Double price,
-         boolean isShowIndividually,
-         StoreDto storeDto,
-         BrandDto brandDto,
+         boolean isDefault,
          List<ProductImageDto> productImages,
-         ProductAttributeSetDto productAttributeSet,
-         List<ProductAttributeValueDto> productAttributeValues,
-         List<ProductVariantDto> productVariants
+         List<ProductAttributeValueDto> productAttributeValues
 ) {
-    public static ProductDto fromModel(Product product, StoreDto storeDto, BrandDto brandDto, List<ProductImageDto> productImages,
-                                       ProductAttributeSetDto productAttributeSet,
-                                       List<ProductAttributeValueDto> productVariations,
-                                       List<ProductVariantDto> productVariants
-                                       ) {
+    public static ProductDto fromModel(Product product,
+                                       List<ProductImageDto> productImages,
+                                       List<ProductAttributeValueDto> productAttributeValues
+    ) {
         return new ProductDto(
                 product.getId(),
-                product.getName(),
-                product.getDescription(),
                 product.isStatus(),
                 product.getQuantity(),
                 product.getPrice(),
-                product.isShowIndividually(),
-                storeDto,
-                brandDto,
+                product.isDefault(),
                 productImages,
-                productAttributeSet,
-                productVariations,
-                productVariants
+                productAttributeValues
         );
     }
 }

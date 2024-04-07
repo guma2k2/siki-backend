@@ -1,19 +1,11 @@
 package com.siki.product.controller;
-
-import com.siki.product.dto.ErrorDto;
 import com.siki.product.dto.product.*;
 import com.siki.product.service.ProductAttributeService;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.*;
+import io.swagger.v3.oas.annotations.responses.*;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,8 +21,8 @@ public class ProductAttributeController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = ProductAttributePostDto[].class))),
     })
-    public ResponseEntity<ProductAttributeSetDto> createProductAttributes(@Valid @RequestBody ProductAttributeSetPostDto productAttributeSetPostDto) {
-        ProductAttributeSetDto productAttributeSetDto = productAttributeService.save(productAttributeSetPostDto);
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productAttributeSetDto);
+    public ResponseEntity<List<ProductAttributeDto>> createProductAttributes(@Valid @RequestBody List<ProductAttributePostDto> productAttributePosts) {
+        List<ProductAttributeDto> productAttributes = productAttributeService.save(productAttributePosts);
+        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productAttributes);
     }
 }

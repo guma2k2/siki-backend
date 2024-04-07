@@ -1,48 +1,30 @@
 package com.siki.product.service.impl;
 
-import com.siki.product.dto.product.ProductAttributeDto;
-import com.siki.product.dto.product.ProductAttributePostDto;
-import com.siki.product.dto.product.ProductAttributeSetDto;
-import com.siki.product.dto.product.ProductAttributeSetPostDto;
-import com.siki.product.model.ProductAttribute;
-import com.siki.product.model.ProductAttributeSet;
-import com.siki.product.model.ProductAttributeValue;
-import com.siki.product.repository.ProductAttributeRepository;
-import com.siki.product.repository.ProductAttributeSetRepository;
-import com.siki.product.repository.ProductAttributeValueRepository;
+import com.siki.product.dto.product.*;
+import com.siki.product.model.*;
+import com.siki.product.repository.*;
 import com.siki.product.service.ProductAttributeService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProductAttributeServiceImpl implements ProductAttributeService {
     private final ProductAttributeRepository productAttributeRepository;
     private final ProductAttributeValueRepository productAttributeValueRepository;
-    private final ProductAttributeSetRepository productAttributeSetRepository;
 
-    public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeSetRepository productAttributeSetRepository) {
+
+    public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository) {
         this.productAttributeRepository = productAttributeRepository;
         this.productAttributeValueRepository = productAttributeValueRepository;
-        this.productAttributeSetRepository = productAttributeSetRepository;
     }
 
-    @Transactional
     @Override
-    public ProductAttributeSetDto save(ProductAttributeSetPostDto productAttributeSetPostDto) {
-        // Create and save the ProductAttributeSet
-        ProductAttributeSet productAttributeSet = ProductAttributeSet.builder()
-                .name(productAttributeSetPostDto.attribute_set_name())
-                .build();
-        productAttributeSetRepository.saveAndFlush(productAttributeSet);
-        List<ProductAttribute> attributes = new ArrayList<>();
+    public List<ProductAttributeDto> save(List<ProductAttributePostDto> productAttributePosts) {
         List<ProductAttributeDto> target = new ArrayList<>();
-        productAttributeSetPostDto.productAttributePostDtoList().forEach(productAttributePostDto -> {
+        productAttributePosts.forEach(productAttributePostDto -> {
             ProductAttribute productAttribute = ProductAttribute.builder()
                     .name(productAttributePostDto.name())
-                    .productAttributeSet(productAttributeSet)
                     .build();
             productAttributeRepository.saveAndFlush(productAttribute);
             List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
@@ -55,20 +37,14 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
             });
             List<ProductAttributeValue> savedProductAttributeValues = productAttributeValueRepository.saveAllAndFlush(productAttributeValues);
             productAttribute.setProductAttributeValues(savedProductAttributeValues);
-            attributes.add(productAttribute);
             ProductAttributeDto productAttributeDto = ProductAttributeDto.fromModel(productAttribute);
             target.add(productAttributeDto);
         });
-        productAttributeSet.setProductAttributes(attributes);
-        ProductAttributeSetDto productAttributeSetDto = ProductAttributeSetDto.fromModel(productAttributeSet, target);
-        return productAttributeSetDto;
+        return target;
     }
-
 
     @Override
     public ProductAttributeDto getById(Long id) {
-//        ProductAttribute productAttribute = productAttributeRepository.get(id).orElseThrow();
-//        return ProductAttributeDto.fromModel(productAttribute);
         return null;
     }
 }

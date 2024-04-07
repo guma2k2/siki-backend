@@ -19,47 +19,24 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 128, nullable = false)
-
-    private String name;
-
-    @Column(length = 512)
-    private String description;
-
     private int quantity;
 
     private Double price;
 
     private boolean status;
 
-    private boolean showIndividually;
-
-    private Integer storeId;
+    private boolean isDefault;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    private Brand brand;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
+    @JoinColumn(name = "base_product_id")
+    private BaseProduct baseProduct;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductImage> productImages = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_attribute_set_id")
-    private ProductAttributeSet productAttributeSet;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductVariation> productVariations = new ArrayList<>();
-
-
-//    public void addVariation(ProductVariation productVariation) {
-//        productVariations.add(productVariation);
-//        productVariation.setProduct(this);
-//    }
 }

@@ -26,6 +26,6 @@ public class ProductAttribute {
     private List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "product_attribute_set_id")
-    private ProductAttributeSet productAttributeSet;
+    @JoinColumn(name = "base_product_id")
+    private BaseProduct baseProduct;
 }

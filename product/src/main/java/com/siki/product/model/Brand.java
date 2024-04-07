@@ -3,6 +3,9 @@ package com.siki.product.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "brand")
 @Setter
@@ -20,4 +23,7 @@ public class Brand {
     private String name;
 
     private String logo;
+
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BaseProduct> productList = new ArrayList<>();
 }
