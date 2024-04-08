@@ -5,6 +5,15 @@ server:
 spring:
   application:
     name: "media"
+  datasource:
+    url: jdbc:mysql://localhost:3306/siki-media
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: '123456789'
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
   security:
     oauth2:
       resourceserver:
@@ -24,7 +33,7 @@ spring:
       secret: 'u3aoCSJzt31lcqOJBsgykwTq81o'
 info:
   app:
-    name: "products"
-    description: "Siki Media Application"
+    name: "medias"
+    description: "Siki Media Service"
     version: "1.0.0"
 

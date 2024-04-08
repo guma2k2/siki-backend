@@ -21,19 +21,19 @@ public class GatewayserverApplication {
 		return routeLocatorBuilder.routes()
 				.route(p -> p
 						.path("/api/users/**")
-						.filters(f -> f.rewritePath("/api/users/(?<segment>.*)","/${segment}")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)","/${segment}")
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://USER")
 				).route(p -> p
 						.path("/api/products/**")
-						.filters(f -> f.rewritePath("/api/products/(?<segment>.*)","/${segment}")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)","/${segment}")
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://PRODUCT")
 				).route(p -> p
 						.path("/api/medias/**")
-						.filters(f -> f.rewritePath("/api/medias/(?<segment>.*)","/${segment}")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)","/${segment}")
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://MEDIA")

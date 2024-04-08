@@ -83,6 +83,7 @@ public class ProductServiceImpl implements ProductService {
         productPosts.forEach(productDto -> {
             Product product = Product.builder()
                     .status(true)
+                    .image(productDto.image())
                     .baseProduct(baseProduct)
                     .quantity(productDto.quantity())
                     .price(productDto.price())
@@ -144,7 +145,6 @@ public class ProductServiceImpl implements ProductService {
             for(ProductImageDto productImage: productImages) {
                 ProductImage newProductImage = ProductImage.builder()
                         .url(productImage.url())
-                        .isDefault(productImage.isDefault())
                         .product(product)
                         .build();
                 productImageList.add(newProductImage);
@@ -154,7 +154,8 @@ public class ProductServiceImpl implements ProductService {
         }
     }
     private void setBrand(BaseProduct baseProduct, Integer brandId) {
-        Brand brand = brandRepository.findById(brandId).orElseThrow(() -> new NotFoundException(Constants.ERROR_CODE.BRAND_NOT_FOUND, brandId));
+        Brand brand = brandRepository.findById(brandId).orElseThrow(() ->
+                new NotFoundException(Constants.ERROR_CODE.BRAND_NOT_FOUND, brandId));
         baseProduct.setBrand(brand);
     }
 }
