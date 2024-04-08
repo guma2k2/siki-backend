@@ -1,6 +1,6 @@
 package com.siki.media.controller;
 
-import com.siki.media.dto.Media;
+import com.siki.media.dto.MediaDto;
 import com.siki.media.service.MediaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +17,27 @@ public class MediaController {
         this.mediaService = mediaService;
     }
 
-    @PostMapping()
-    public ResponseEntity<Media> save (@RequestParam("file") MultipartFile multipartFile,
-                                       @RequestParam("type") String type) {
-        Media media = mediaService.saveOrUpdateFile(multipartFile, "", type);
+    @PostMapping("/create")
+    public ResponseEntity<MediaDto> save (@RequestParam("file") MultipartFile multipartFile,
+                                          @RequestParam("type") String type) {
+        MediaDto media = mediaService.create(multipartFile, type);
         return ResponseEntity.ok().body(media);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Media> update (@RequestParam("file")MultipartFile multipartFile,
-                                         @PathVariable("id") String id,
-                                         @PathVariable("type") String type) {
-        Media media = mediaService.saveOrUpdateFile(multipartFile, id, type);
+    public ResponseEntity<MediaDto> updateUrl (@RequestParam("file")MultipartFile multipartFile,
+                                               @PathVariable("id") String id,
+                                               @RequestParam("type") String type
+    ) {
+        MediaDto media = mediaService.updateUrl(multipartFile, id, type);
+        return ResponseEntity.ok().body(media);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<MediaDto> updateStatus (
+                                            @PathVariable("id") String id,
+                                            @RequestParam("status") boolean status) {
+        MediaDto media = mediaService.updateStatus(id, status);
         return ResponseEntity.ok().body(media);
     }
 

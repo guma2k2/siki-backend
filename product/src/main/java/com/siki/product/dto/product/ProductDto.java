@@ -13,6 +13,7 @@ public record ProductDto (
          int quantity,
          Double price,
          boolean isDefault,
+         String image,
          List<ProductImageDto> productImages,
          List<ProductAttributeValueDto> productAttributeValues
 ) {
@@ -20,12 +21,14 @@ public record ProductDto (
                                        List<ProductImageDto> productImages,
                                        List<ProductAttributeValueDto> productAttributeValues
     ) {
+        // Todo : get image in media service
         return new ProductDto(
                 product.getId(),
                 product.isStatus(),
                 product.getQuantity(),
                 product.getPrice(),
                 product.isDefault(),
+                product.getImage(),
                 productImages,
                 productAttributeValues
         );

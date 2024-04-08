@@ -6,6 +6,7 @@ public record ProductPostDto (
         boolean status,
         int quantity,
         Double price,
+        String image,
         List<ProductImageDto> productImageIds,
         List<Long> productOptionValueIds
 ) {
