@@ -4,6 +4,7 @@ import com.siki.product.dto.product.*;
 import com.siki.product.model.*;
 import com.siki.product.repository.*;
 import com.siki.product.service.ProductAttributeService;
+import com.siki.product.service.client.MediaFeignClient;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,10 +14,13 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
     private final ProductAttributeRepository productAttributeRepository;
     private final ProductAttributeValueRepository productAttributeValueRepository;
 
+    private final MediaFeignClient mediaFeignClient;
 
-    public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository) {
+
+    public ProductAttributeServiceImpl(ProductAttributeRepository productAttributeRepository, ProductAttributeValueRepository productAttributeValueRepository, MediaFeignClient mediaFeignClient) {
         this.productAttributeRepository = productAttributeRepository;
         this.productAttributeValueRepository = productAttributeValueRepository;
+        this.mediaFeignClient = mediaFeignClient;
     }
 
     @Override
@@ -37,7 +41,14 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
             });
             List<ProductAttributeValue> savedProductAttributeValues = productAttributeValueRepository.saveAllAndFlush(productAttributeValues);
             productAttribute.setProductAttributeValues(savedProductAttributeValues);
-            ProductAttributeDto productAttributeDto = ProductAttributeDto.fromModel(productAttribute);
+            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
+                String image = "";
+                if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
+                    image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
+                }
+                return ProductAttributeValueDto.fromModel(productAttributeValue, image);
+            }).toList();
+            ProductAttributeDto productAttributeDto = ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
             target.add(productAttributeDto);
         });
         return target;

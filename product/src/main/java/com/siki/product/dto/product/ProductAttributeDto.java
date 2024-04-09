@@ -11,10 +11,7 @@ public record ProductAttributeDto(
         List<ProductAttributeValueDto> productAttributeValues
 ) {
 
-    public static ProductAttributeDto fromModel(ProductAttribute productAttribute){
-        List<ProductAttributeValue> productAttributeValues = productAttribute.getProductAttributeValues();
-        List<ProductAttributeValueDto> productAttributeValueDtos =
-                productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
-        return new ProductAttributeDto(productAttribute.getId(), productAttribute.getName(), productAttributeValueDtos);
+    public static ProductAttributeDto fromModel(ProductAttribute productAttribute, List<ProductAttributeValueDto> productAttributeValues){
+        return new ProductAttributeDto(productAttribute.getId(), productAttribute.getName(), productAttributeValues);
     }
 }
