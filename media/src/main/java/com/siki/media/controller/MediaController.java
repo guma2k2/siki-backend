@@ -42,7 +42,7 @@ public class MediaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> get (@PathVariable("id") String id) {
+    public ResponseEntity<String> getUrlById(@PathVariable("id") String id) {
         String url = mediaService.getUrlById(id);
         return ResponseEntity.ok().body(url);
     }

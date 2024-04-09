@@ -20,6 +20,8 @@ public class ProductAttributeValue {
 
     private String value;
 
+    private String image;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_attribute_id")
     private ProductAttribute productAttribute;

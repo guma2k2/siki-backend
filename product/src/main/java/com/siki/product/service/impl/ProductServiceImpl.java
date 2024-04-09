@@ -6,6 +6,7 @@ import com.siki.product.exception.*;
 import com.siki.product.model.*;
 import com.siki.product.repository.*;
 import com.siki.product.service.ProductService;
+import com.siki.product.service.client.MediaFeignClient;
 import com.siki.product.utils.Constants;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductAttributeValueRepository productAttributeValueRepository;
     private final ProductAttributeRepository productAttributeRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository) {
+    private final MediaFeignClient mediaFeignClient;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, MediaFeignClient mediaFeignClient) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
@@ -35,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
         this.productVariationRepository = productVariationRepository;
         this.productAttributeValueRepository = productAttributeValueRepository;
         this.productAttributeRepository = productAttributeRepository;
+        this.mediaFeignClient = mediaFeignClient;
     }
 
 
@@ -59,15 +63,33 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public BaseProductDto getById(Long baseProductId) {
         BaseProduct baseProduct = baseProductRepository.findByIdCustom(baseProductId).orElseThrow();
-
         List<ProductAttribute> productAttributes = productAttributeRepository.findByBaseProductId(baseProductId);
-
         List<ProductAttributeDto> productAttributeDtos =
-                productAttributes.stream().map(ProductAttributeDto::fromModel).toList();
+                productAttributes.stream().map(productAttribute -> {
+                    List<ProductAttributeValue> productAttributeValues = productAttribute.getProductAttributeValues();
+                    List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
+                        String image = "";
+                        if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
+                            image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
+                        }
+                        return ProductAttributeValueDto.fromModel(productAttributeValue, image);
+                    }).toList();
+                    return ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
+                }).toList();
         List<ProductDto> productVariants = getProductVariantsById(baseProductId);
         List<String> breadcrumb = getBreadcrumb(baseProduct.getCategory().getId(), baseProduct.getName());
         StoreDto storeDto = null;
         return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
+    }
+
+    @Override
+    public ProductVariantDto findProductVariantById(Long productId) {
+        Product product = productRepository.findByIdCustom(productId).orElseThrow();
+        StoreDto store = null;
+        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
+        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
+        List<String> values = productAttributeValues.stream().map(productAttributeValue -> productAttributeValue.getValue()).toList();
+        return ProductVariantDto.fromModel(product, values, store);
     }
 
     private void setProductAttributes(BaseProduct baseProduct, List<Long> attributeIds) {
@@ -113,11 +135,21 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findByBaseProductId(baseProductId);
         List<ProductDto> target = products.stream().map(product -> {
             Long productId = product.getId();
-            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(ProductImageDto::fromModel).toList();
+            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> {
+                String url = mediaFeignClient.getUrlById(productImage.getUrl()).getBody();
+                return ProductImageDto.fromModel(productImage, url);
+            }).toList();
             List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
             List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
-            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
-            return ProductDto.fromModel(product, productImageDtos, productAttributeValueDtos);
+            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
+                String image = "";
+                if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
+                    image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
+                }
+                return ProductAttributeValueDto.fromModel(productAttributeValue, image);
+            }).toList();
+            String image = mediaFeignClient.getUrlById(product.getImage()).getBody();
+            return ProductDto.fromModel(product, productImageDtos, productAttributeValueDtos, image);
         }).toList();
         return target;
     }

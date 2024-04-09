@@ -4,18 +4,17 @@ import com.siki.product.dto.ErrorDto;
 import com.siki.product.dto.product.BaseProductDto;
 import com.siki.product.dto.product.BaseProductPostDto;
 import com.siki.product.dto.product.ProductDto;
-import com.siki.product.dto.product.ProductPostDto;
+import com.siki.product.dto.product.ProductVariantDto;
 import com.siki.product.service.ProductService;
+import com.siki.product.service.client.MediaFeignClient;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatusCode;
+import jakarta.ws.rs.GET;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 public class ProductController {
@@ -26,12 +25,19 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/backoffice/products/{id}")
+    @GetMapping("/storefront/products/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     public ResponseEntity<BaseProductDto> getProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getById(id));
+    }
+    @GetMapping("/storefront/products-variant/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
+    public ResponseEntity<ProductVariantDto> getByProductId(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(productService.findProductVariantById(id));
     }
 
     @PostMapping("/backoffice/products")
@@ -43,4 +49,5 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    // Todo : update quantity, get relatedProduct, get product multi query
 }
