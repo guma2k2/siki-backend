@@ -6,11 +6,12 @@ import com.siki.cart.model.Cart;
 import com.siki.cart.repository.CartRepository;
 import com.siki.cart.service.client.ProductFeignClient;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;

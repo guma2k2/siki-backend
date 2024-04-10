@@ -20,6 +20,7 @@
 		<keycloak.version>24.0.1</keycloak.version>
 	</properties>
 	<dependencies>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
