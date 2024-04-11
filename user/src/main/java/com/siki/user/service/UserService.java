@@ -23,98 +23,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Objects;
 
-@Service
-@Slf4j
-public class UserService {
-    private final Keycloak keycloak;
-    @Value("${keycloak.realm}")
-    private String realm;
+public interface UserService {
 
-    @Value("${keycloak.resource}")
-    private String adminClientId;
-    private final static String CUSTOMER = "CUSTOMER";
+    UserDto createCustomer(CustomerPostDto customerPostDto);
+    UserDto getCustomerProfile(String customerId);
+    UserDto updateCustomer(CustomerProfileRequest customerProfileRequest);
 
-    public UserService(Keycloak keycloak) {
-        this.keycloak = keycloak;
-    }
 
-    public UserDto createCustomer (
-            CustomerPostDto customerPostDto
-    ) {
-       try {
-//           log.info(realm);
-           // Todo: check email is existed
-           RealmResource resource = keycloak.realm(realm);
-           CredentialRepresentation credential = createPasswordCredentials(customerPostDto.password());
-           UserRepresentation user = new UserRepresentation();
-           user.setFirstName(customerPostDto.firstName());
-           user.setLastName(customerPostDto.lastName());
-           user.setEmail(customerPostDto.email());
-           user.setUsername(customerPostDto.username());
-           user.setCredentials(Collections.singletonList(credential));
-           user.setEnabled(true);
-           Response response = resource.users().create(user);
-
-           // get new user
-           if (Objects.equals(response.getStatus(),201)) {
-               String userId = CreatedResponseUtil.getCreatedId(response);
-               user.setId(userId);
-               UserResource userResource = resource.users().get(userId);
-               RoleRepresentation guestRealmRole = resource.roles().get(CUSTOMER).toRepresentation();
-
-               // Assign realm role GUEST to user
-               userResource.roles().realmLevel().add(Collections.singletonList(guestRealmRole));
-
-               return UserDto.fromUserRepresentation(user);
-           }
-           return null;
-       } catch (ForbiddenException ex) {
-           log.error(ex.getMessage());
-           return null;
-       }
-
-    }
-    public static CredentialRepresentation createPasswordCredentials(String password) {
-        CredentialRepresentation passwordCredentials = new CredentialRepresentation();
-        passwordCredentials.setTemporary(false);
-        passwordCredentials.setType(CredentialRepresentation.PASSWORD);
-        passwordCredentials.setValue(password);
-        return passwordCredentials;
-    }
-
-    public UserDto getCustomerProfile(String customerId) {
-        try {
-            UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
-            return UserDto.fromUserRepresentation(userRepresentation);
-        }catch (ForbiddenException ex) {
-            throw new AccessDeniedException(String.format(Constants.ERROR_CODE.ACCESS_DENIED_ERROR_FORMAT,
-                    ex.getMessage(), adminClientId));
-        }
-    }
-
-    public UserDto updateCustomer(CustomerProfileRequest customerProfileRequest) {
-        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
-        if (userRepresentation != null) {
-            RealmResource resource = keycloak.realm(realm);
-            UserResource userResource = resource.users().get(customerId);
-
-            userRepresentation.setFirstName(customerProfileRequest.firstName());
-            userRepresentation.setLastName(customerProfileRequest.lastName());
-            userRepresentation.setEmail(customerProfileRequest.email());
-
-            if (customerProfileRequest.password() != null) {
-                userRepresentation.setCredentials(Collections.singletonList(createPasswordCredentials(customerProfileRequest.password())));
-            }
-            try {
-                userResource.update(userRepresentation);
-            }catch (BadRequestException ex) {
-                log.error(ex.toString());
-                log.error(ex.getMessage());
-            }
-            return UserDto.fromUserRepresentation(userRepresentation);
-        }  else {
-            throw new RuntimeException();
-        }
-    }
 }
