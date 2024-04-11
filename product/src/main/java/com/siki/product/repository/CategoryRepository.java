@@ -31,7 +31,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             select c
             from Category c
             left join fetch c.parent
-            where c.parent != null
+            where c.parent = null
             """)
     List<Category> findCategoryParents();
 }
