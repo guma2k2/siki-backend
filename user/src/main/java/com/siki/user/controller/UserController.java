@@ -18,16 +18,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public String helloWorld() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        return"User service " + name;
-    }
-
     @GetMapping("/storefront/customer/profile")
     public ResponseEntity<UserDto> getCustomerProfile() {
         String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
         UserDto userDto = userService.getCustomerProfile(customerId);
+        return ResponseEntity.ok().body(userDto);
+    }
+
+
+    @GetMapping("/storefront/customer/{id}")
+    public ResponseEntity<UserDto> getCustomerById(
+            @RequestParam("id") String id
+    ) {
+        UserDto userDto = userService.getCustomerProfile(id);
         return ResponseEntity.ok().body(userDto);
     }
 
