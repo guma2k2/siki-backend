@@ -4,6 +4,7 @@ import com.siki.review.dto.*;
 import com.siki.review.model.Review;
 import com.siki.review.repository.ReviewRepository;
 import com.siki.review.service.ReviewService;
+import com.siki.review.service.client.CustomerFeignClient;
 import com.siki.review.service.client.ProductFeignClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,10 +21,12 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
 
     private final ProductFeignClient productFeignClient;
+    private final CustomerFeignClient customerFeignClient;
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository, ProductFeignClient productFeignClient) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, ProductFeignClient productFeignClient, CustomerFeignClient customerFeignClient) {
         this.reviewRepository = reviewRepository;
         this.productFeignClient = productFeignClient;
+        this.customerFeignClient = customerFeignClient;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Sort sort = Sort.by(sortField);
         sort = sortDir == "desc" ? sort.descending() : sort.ascending()    ;
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
         Page<Review> reviewPage = null;
         if (ratingStar != null) {
             reviewPage = reviewRepository.findByRatingStar(ratingStar, baseProductId, pageable);
@@ -66,8 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
             String customerId = review.getCustomerId();
             Long productId = review.getProductId();
             ProductVariantDto product = productFeignClient.getByProductId(productId).getBody();
-            // Todo: get customer by id
-            CustomerDto customerDto = null;
+            CustomerDto customerDto = customerFeignClient.getCustomerById(customerId).getBody();
             return ReviewDto.fromModel(review, customerDto, product);
         }).toList();
 
