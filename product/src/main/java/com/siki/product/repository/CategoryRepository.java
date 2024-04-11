@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,12 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             where c.id = :id
             """)
     Optional<Category> findByIdCustom(@Param("id") Integer id);
+
+    @Query("""
+            select c
+            from Category c
+            left join fetch c.parent
+            where c.parent != null
+            """)
+    Optional<List<Category>> findCategoryParents();
 }
