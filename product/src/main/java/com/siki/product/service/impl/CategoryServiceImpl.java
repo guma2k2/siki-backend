@@ -5,32 +5,42 @@ import com.siki.product.dto.category.CategoryPostDto;
 import com.siki.product.model.Category;
 import com.siki.product.repository.CategoryRepository;
 import com.siki.product.service.CategoryService;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
     @Override
     public void create(CategoryPostDto categoryPostDto) {
+        // Todo check name is exist
         Category category = Category.builder()
                 .name(categoryPostDto.name())
                 .image(categoryPostDto.image())
                 .description(categoryPostDto.description())
                 .build();
+        if (categoryPostDto.categoryParentId() != null) {
+            Category parent = categoryRepository.findById(categoryPostDto.categoryParentId()).orElseThrow();
+            category.setParent(parent);
+        }
+
         categoryRepository.save(category);
     }
 
     @Override
     public CategoryDto update(CategoryPostDto categoryPostDto, Integer categoryId) {
+        // Todo check name is exist
         Category categoryFound = categoryRepository.findById(categoryId).orElseThrow();
         categoryFound.setName(categoryPostDto.name());
         categoryFound.setImage(categoryPostDto.image());
         categoryFound.setDescription(categoryPostDto.description());
-        categoryRepository.save(categoryFound);
+        categoryRepository.saveAndFlush(categoryFound);
         return CategoryDto.fromModel(categoryFound);
     }
 
@@ -42,8 +52,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryDto> getAllCategoryParents() {
-        List<Category> categoryList = categoryRepository.findCategoryParents().orElseThrow();
-        return categoryList.stream().map(c -> CategoryDto.fromModel(c)).toList();
+        List<Category> categoryList = categoryRepository.findCategoryParents();
+        return categoryList.stream().map(category -> CategoryDto.fromModel(category)).toList();
     }
 
     @Override
