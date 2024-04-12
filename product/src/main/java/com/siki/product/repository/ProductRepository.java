@@ -36,4 +36,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where bp.id = :baseProductId
             """)
     List<Product> findByBaseProductId(@Param("baseProductId") Long baseProductId);
+
 }

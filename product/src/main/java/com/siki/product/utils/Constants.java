@@ -8,4 +8,11 @@ public class Constants {
         public static final String CATEGORY_NOT_FOUND = "Category with id : %d is not found";
         public static final String ACCESS_DENIED_ERROR_FORMAT = "%s: Client %s don't have access right for this resource";
     }
+
+    public final class PageableConstant{
+        public static final String DEFAULT_PAGE_NUMBER = "0";
+        public static final String DEFAULT_PAGE_SIZE = "20";
+        public static final String DEFAULT_SORT_FIELD = "createdAt";
+        public static final String DEFAULT_SORT_DIR = "asc";
+    }
 }
