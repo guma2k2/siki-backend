@@ -6,8 +6,8 @@ import com.siki.product.dto.category.CategoryPostDto;
 import java.util.List;
 
 public interface CategoryService {
-    // Todo1 : get category by name return category and 10 these products
-    // Todo2 : when get a category then, return a list of category childrens, and these products (pageable data) 
+    // Todo 1 : get category by name return category and 10 these products
+    // Todo 2 : when get a category then, return a list of category childrens, and these products (PageableData)
 
     void create(CategoryPostDto categoryPostDto);
     

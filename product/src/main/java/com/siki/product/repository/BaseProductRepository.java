@@ -1,11 +1,14 @@
 package com.siki.product.repository;
 
 import com.siki.product.model.BaseProduct;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +23,20 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
             """)
     Optional<BaseProduct> findByIdCustom(@Param("id") Long id);
 
+    @Query("""
+            select p 
+            from Product p 
+            left join fetch p.category c
+            left join fetch p.brand b
+            where c.name = :categoryName
+            and (b.name is null or b.name in :brandNames)
+            and (:startPrice is null or p.price >= :startPrice)
+            and (:endPrice is null or p.price <= :endPrice)
+             
+            """)
+    Page<BaseProduct> findByCategoryBrandPriceBetween(@Param("categoryName") String categoryName,
+                                                      @Param("brandNames") String[] brandNames,
+                                                      @Param("startPrice") Double startPrice,
+                                                      @Param("endPrice") Double endPrice,
+                                                      Pageable pageable);
 }

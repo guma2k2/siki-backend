@@ -1,12 +1,11 @@
 package com.siki.product.controller;
 
 import com.siki.product.dto.ErrorDto;
-import com.siki.product.dto.product.BaseProductDto;
-import com.siki.product.dto.product.BaseProductPostDto;
-import com.siki.product.dto.product.ProductDto;
-import com.siki.product.dto.product.ProductVariantDto;
+import com.siki.product.dto.PageableData;
+import com.siki.product.dto.product.*;
 import com.siki.product.service.ProductService;
 import com.siki.product.service.client.MediaFeignClient;
+import com.siki.product.utils.Constants;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,6 +23,10 @@ public class ProductController {
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
+    /*
+        storefront: customer
+        backoffice: admin
+    */
 
     @GetMapping("/storefront/products/{id}")
     @ApiResponses(value = {
@@ -38,6 +41,20 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     public ResponseEntity<ProductVariantDto> getByProductId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.findProductVariantById(id));
+    }
+    @GetMapping("/storefront/products")
+    public ResponseEntity<PageableData<BaseProductGetListDto>> getProductsByMultiQuery(
+            @RequestParam(value = "categoryName", required = false) String categoryName,
+            @RequestParam(value = "brandNames", required = false) String[] brandNames,
+            @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortDir", required = false) String sortDir,
+            @RequestParam(value = "sortField", required = false) String sortField,
+            @RequestParam(value = "startPrice", required = false) Double startPrice,
+            @RequestParam(value = "endPrice", required = false) Double endPrice,
+            @RequestParam(value = "ratingStar", required = false) int ratingStar
+    ) {
+        return ResponseEntity.ok().body(productService.getProductByMultiQuery(categoryName, brandNames, pageNum, pageSize, sortDir, sortField, startPrice, endPrice, ratingStar));
     }
 
     @PostMapping("/backoffice/products")

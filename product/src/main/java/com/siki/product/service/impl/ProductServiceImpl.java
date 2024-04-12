@@ -1,5 +1,6 @@
 package com.siki.product.service.impl;
 
+import com.siki.product.dto.PageableData;
 import com.siki.product.dto.StoreDto;
 import com.siki.product.dto.product.*;
 import com.siki.product.exception.*;
@@ -8,6 +9,10 @@ import com.siki.product.repository.*;
 import com.siki.product.service.ProductService;
 import com.siki.product.service.client.MediaFeignClient;
 import com.siki.product.utils.Constants;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,6 +96,46 @@ public class ProductServiceImpl implements ProductService {
         List<String> values = productAttributeValues.stream().map(productAttributeValue -> productAttributeValue.getValue()).toList();
         return ProductVariantDto.fromModel(product, values, store);
     }
+
+    @Override
+    public PageableData<BaseProductGetListDto> getProductByMultiQuery(String categoryName,
+                                                                      String[] brandNames,
+                                                                      int pageNum,
+                                                                      int pageSize,
+                                                                      String sortDir,
+                                                                      String sortField,
+                                                                      Double startPrice,
+                                                                      Double endPrice,
+                                                                      int ratingStar
+    ) {
+        Pageable pageable = null;
+        if (sortDir != null && sortField != null) {
+            Sort sort = Sort.by(sortField);
+            sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
+            pageable = PageRequest.of(pageNum, pageSize, sort);
+        }else {
+            pageable = PageRequest.of(pageNum, pageSize);
+        }
+
+        Page<BaseProduct> baseProducts = baseProductRepository.findByCategoryBrandPriceBetween(categoryName, brandNames, startPrice, endPrice, pageable);
+        List<BaseProduct> baseProductList = baseProducts.getContent();
+        List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
+            // Todo : get default attribute of baseProduct
+            String imgUrl = "";
+            Double price = 1000000.0;
+            float averageRating = 5;
+            int soldNum = 0 ;
+            return BaseProductGetListDto.fromModel(baseProduct, imgUrl, price, averageRating,soldNum);
+        }).toList();
+        return new PageableData<BaseProductGetListDto>(
+                pageNum,
+                pageSize,
+                baseProducts.getTotalElements(),
+                baseProducts.getTotalPages(),
+                target
+        );
+    }
+
 
     private void setProductAttributes(BaseProduct baseProduct, List<Long> attributeIds) {
         List<ProductAttribute> attributes = productAttributeRepository.findByIds(attributeIds);
