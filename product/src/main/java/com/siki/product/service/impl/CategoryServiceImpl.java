@@ -2,6 +2,7 @@ package com.siki.product.service.impl;
 
 import com.siki.product.dto.category.CategoryDto;
 import com.siki.product.dto.category.CategoryPostDto;
+import com.siki.product.exception.DuplicatedException;
 import com.siki.product.model.Category;
 import com.siki.product.repository.CategoryRepository;
 import com.siki.product.service.CategoryService;
@@ -19,11 +20,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void create(CategoryPostDto categoryPostDto) {
-        // Todo check name is exist
+        Category categoryFound = categoryRepository.findByName(categoryPostDto.name()).orElseThrow();
+        if (categoryFound != null)
+            throw new DuplicatedException("Category name already exist");
         Category category = Category.builder()
                 .name(categoryPostDto.name())
                 .image(categoryPostDto.image())
                 .description(categoryPostDto.description())
+                .parent(categoryRepository.findById(categoryPostDto.categoryParentId()).orElseThrow())
                 .build();
         if (categoryPostDto.categoryParentId() != null) {
             Category parent = categoryRepository.findById(categoryPostDto.categoryParentId()).orElseThrow();
@@ -35,8 +39,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto update(CategoryPostDto categoryPostDto, Integer categoryId) {
-        // Todo check name is exist
-        Category categoryFound = categoryRepository.findById(categoryId).orElseThrow();
+        Category categoryFound = categoryRepository.findByName(categoryPostDto.name()).orElseThrow();
+        if (categoryFound != null)
+            throw new DuplicatedException("Category name already exist");
         categoryFound.setName(categoryPostDto.name());
         categoryFound.setImage(categoryPostDto.image());
         categoryFound.setDescription(categoryPostDto.description());

@@ -34,4 +34,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             where c.parent = null
             """)
     List<Category> findCategoryParents();
+
+    Optional<Category> findByName(String name);
 }
