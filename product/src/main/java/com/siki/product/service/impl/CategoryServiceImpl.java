@@ -7,7 +7,6 @@ import com.siki.product.dto.product.BaseProductGetListDto;
 import com.siki.product.exception.DuplicatedException;
 import com.siki.product.model.BaseProduct;
 import com.siki.product.model.Category;
-import com.siki.product.model.Product;
 import com.siki.product.repository.CategoryRepository;
 import com.siki.product.service.CategoryService;
 import org.springframework.stereotype.Service;
@@ -72,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryGetDto listAllByName(String categoryName) {
+    public CategoryGetDto listByName(String categoryName) {
         Category category = categoryRepository.findByName(categoryName).orElseThrow();
 
         List<Category> categoryList = category.getChildrenList();

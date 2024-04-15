@@ -9,7 +9,6 @@
         <option value="$PROJECT_DIR$/gatewayserver/pom.xml" />
         <option value="$PROJECT_DIR$/product/pom.xml" />
         <option value="$PROJECT_DIR$/media/pom.xml" />
-        <option value="$PROJECT_DIR$/review/pom.xml" />
         <option value="$PROJECT_DIR$/order/pom.xml" />
         <option value="$PROJECT_DIR$/cart/pom.xml" />
       </list>

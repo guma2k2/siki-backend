@@ -6,7 +6,7 @@ public record BaseProductGetListDto (
         Long id,
         String name,
         String slug,
-        String imageUrl,
+        String image,
         Double price,
         float averageRating,
         int soldNum

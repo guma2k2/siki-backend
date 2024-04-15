@@ -21,7 +21,7 @@ public class BrandController {
         this.brandService = brandService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Created", content = @Content(schema = @Schema(implementation = BrandPostDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))

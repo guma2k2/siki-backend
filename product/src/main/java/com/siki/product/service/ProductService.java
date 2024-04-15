@@ -11,7 +11,7 @@ public interface ProductService {
     
     BaseProductDto getById(Long productId);
 
-    ProductVariantDto findProductVariantById(Long productId);
+//    ProductVariantDto findProductVariantById(Long productId);
 
     PageableData<BaseProductGetListDto> getProductByMultiQuery(String categoryName, String[] brandNames, int pageNum, int pageSize, String sortDir, String sortField, Double startPrice, Double endPrice, int ratingStar);
 }

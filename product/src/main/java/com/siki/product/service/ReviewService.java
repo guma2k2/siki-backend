@@ -1,10 +1,8 @@
-package com.siki.review.service;
+package com.siki.product.service;
 
-import com.siki.review.dto.PageableData;
-import com.siki.review.dto.ReviewDto;
-import com.siki.review.dto.ReviewPostDto;
-
-import java.util.List;
+import com.siki.product.dto.PageableData;
+import com.siki.product.dto.review.ReviewDto;
+import com.siki.product.dto.review.ReviewPostDto;
 
 public interface ReviewService {
 

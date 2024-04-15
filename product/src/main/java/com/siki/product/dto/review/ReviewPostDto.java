@@ -1,9 +1,8 @@
-package com.siki.review.dto;
+package com.siki.product.dto.review;
 
 public record ReviewPostDto(
         Long id,
         Long productId,
-        Long baseProductId,
         String content,
         int ratingStar
 ) {

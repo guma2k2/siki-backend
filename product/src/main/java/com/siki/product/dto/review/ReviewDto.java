@@ -1,6 +1,8 @@
-package com.siki.review.dto;
+package com.siki.product.dto.review;
 
-import com.siki.review.model.Review;
+import com.siki.product.dto.CustomerDto;
+import com.siki.product.dto.product.ProductVariantDto;
+import com.siki.product.model.Review;
 
 public record ReviewDto (
         Long id,

@@ -1,10 +1,10 @@
-package com.siki.review.controller;
+package com.siki.product.controller;
 
-import com.siki.review.dto.PageableData;
-import com.siki.review.dto.ReviewDto;
-import com.siki.review.dto.ReviewPostDto;
-import com.siki.review.service.ReviewService;
-import com.siki.review.utils.Constants;
+import com.siki.product.dto.PageableData;
+import com.siki.product.dto.review.ReviewDto;
+import com.siki.product.dto.review.ReviewPostDto;
+import com.siki.product.service.ReviewService;
+import com.siki.product.utils.Constants;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
