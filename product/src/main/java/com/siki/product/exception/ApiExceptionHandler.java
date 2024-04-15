@@ -22,6 +22,15 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(errorVm, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(DuplicatedException.class)
+    public ResponseEntity<ErrorDto> handleDuplicatedException(DuplicatedException ex, WebRequest request) {
+        String message = ex.getMessage();
+        ErrorDto errorDto = new ErrorDto(HttpStatus.CONFLICT.toString(), "AlreadyExist", message);
+        log.warn(ERROR_LOG_FORMAT, this.getServletPath(request), 409, message);
+        log.debug(ex.toString());
+        return new ResponseEntity<>(errorDto, HttpStatus.CONFLICT);
+    }
+
 
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;

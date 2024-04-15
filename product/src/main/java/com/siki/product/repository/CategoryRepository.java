@@ -4,6 +4,7 @@ import com.siki.product.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("""
             select c
             from Category c
-            where c.name = :name and (id != null or c.id != id)
+            where c.name = :name and (id != null or c.id != :id)
             """)
     Optional<Category> findByIdAndName(@Param("id") Integer id, @Param("name") String name);
 
@@ -34,4 +35,13 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             where c.parent = null
             """)
     List<Category> findCategoryParents();
+
+    @Query("""
+            select c
+            from Category c
+            left join fetch c.parent
+            where c.parent.id = :id
+            """)
+    List<Category> findByParentId(@Param("id") Integer id);
+    Optional<Category> findByName(String name);
 }

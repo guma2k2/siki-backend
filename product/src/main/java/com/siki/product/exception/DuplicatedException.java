@@ -1,6 +1,9 @@
 package com.siki.product.exception;
 
 import com.siki.product.utils.MessageUtils;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
 
 public class DuplicatedException extends RuntimeException{
     private String message;
