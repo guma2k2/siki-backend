@@ -20,5 +20,5 @@ public interface CategoryService {
 
     CategoryDto getById(Integer categoryId);
 
-    CategoryGetDto listAllByName(String categoryName);
+    CategoryGetDto listByName(String categoryName);
 }

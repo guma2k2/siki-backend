@@ -1,7 +1,6 @@
-package com.siki.review.service.client;
+package com.siki.product.service.client;
 
-import com.siki.review.dto.CustomerDto;
-import com.siki.review.dto.ProductVariantDto;
+import com.siki.product.dto.CustomerDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

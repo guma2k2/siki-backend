@@ -1,4 +1,4 @@
-package com.siki.review.model;
+package com.siki.product.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,10 +21,14 @@ public class Review {
     private Long id;
 
     private String content;
+
     private int ratingStar;
-    private Long productId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+
     private String customerId;
-    private Long baseProductId;
 
     @CreatedDate
     @Column(name = "created_at")
