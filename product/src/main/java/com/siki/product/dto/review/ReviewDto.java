@@ -7,6 +7,7 @@ import com.siki.product.model.Review;
 public record ReviewDto (
         Long id,
         String content,
+        int rating,
         CustomerDto customer,
         ProductVariantDto product,
         String created_at,
@@ -18,7 +19,7 @@ public record ReviewDto (
                                       ProductVariantDto product
                                       ) {
         return new ReviewDto(
-                review.getId(), review.getContent(), customer, product, review.getCreatedAt().toString(), review.getUpdatedAt().toString()
+                review.getId(), review.getContent(), review.getRatingStar(), customer, product, review.getCreatedAt().toString(), review.getUpdatedAt().toString()
         );
     }
 }
