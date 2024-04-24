@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductAttributeRepository extends JpaRepository<ProductAttribute, Long> {
@@ -26,4 +27,6 @@ public interface ProductAttributeRepository extends JpaRepository<ProductAttribu
             where bp.id = :baseProductId
             """)
     List<ProductAttribute> findByBaseProductId(@Param("baseProductId") Long baseProductId);
+
+
 }

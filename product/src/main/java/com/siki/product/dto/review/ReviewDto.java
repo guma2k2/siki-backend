@@ -9,17 +9,17 @@ public record ReviewDto (
         String content,
         int rating,
         CustomerDto customer,
-        ProductVariantDto product,
+        String variant,
         String created_at,
         String updated_at
 ) {
 
     public static ReviewDto fromModel(Review review,
                                       CustomerDto customer,
-                                      ProductVariantDto product
+                                      String variant
                                       ) {
         return new ReviewDto(
-                review.getId(), review.getContent(), review.getRatingStar(), customer, product, review.getCreatedAt().toString(), review.getUpdatedAt().toString()
+                review.getId(), review.getContent(), review.getRatingStar(), customer, variant, review.getCreatedAt().toString(), review.getUpdatedAt().toString()
         );
     }
 }
