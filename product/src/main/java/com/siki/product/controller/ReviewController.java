@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ReviewController {
 
@@ -32,13 +34,13 @@ public class ReviewController {
 
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
 
-            @RequestParam(value = "ratingStar", required = false) int ratingStar,
+            @RequestParam(value = "ratingStars", required = false) List<Integer> ratingStars,
 
             @RequestParam(value = "sortDir", required = false) String sortDir,
 
             @RequestParam(value = "sortField", required = false) String sortField
     ) {
-        return ResponseEntity.ok().body(reviewService.getByBaseProductId(baseProductId, pageNum, pageSize, ratingStar,sortDir,sortField));
+        return ResponseEntity.ok().body(reviewService.getByBaseProductId(baseProductId, pageNum, pageSize, ratingStars,sortDir,sortField));
     }
 
 

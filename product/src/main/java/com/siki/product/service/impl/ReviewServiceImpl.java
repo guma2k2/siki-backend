@@ -6,10 +6,8 @@ import com.siki.product.dto.StoreDto;
 import com.siki.product.dto.product.ProductVariantDto;
 import com.siki.product.dto.review.ReviewDto;
 import com.siki.product.dto.review.ReviewPostDto;
-import com.siki.product.model.Product;
-import com.siki.product.model.ProductAttributeValue;
-import com.siki.product.model.ProductVariation;
-import com.siki.product.model.Review;
+import com.siki.product.model.*;
+import com.siki.product.repository.ProductAttributeValueRepository;
 import com.siki.product.repository.ProductRepository;
 import com.siki.product.repository.ProductVariationRepository;
 import com.siki.product.repository.ReviewRepository;
@@ -34,12 +32,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ProductRepository productRepository;
 
+    private final ProductAttributeValueRepository productAttributeValueRepository;
+
     private final ProductVariationRepository productVariationRepository;
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository, CustomerFeignClient customerFeignClient, ProductRepository productRepository, ProductVariationRepository productVariationRepository) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, CustomerFeignClient customerFeignClient, ProductRepository productRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductVariationRepository productVariationRepository) {
         this.reviewRepository = reviewRepository;
         this.customerFeignClient = customerFeignClient;
         this.productRepository = productRepository;
+        this.productAttributeValueRepository = productAttributeValueRepository;
         this.productVariationRepository = productVariationRepository;
     }
 
@@ -61,7 +62,7 @@ public class ReviewServiceImpl implements ReviewService {
             Long baseProductId,
             Integer pageNum,
             int pageSize,
-            Integer ratingStar,
+            List<Integer> ratingStars,
             String sortDir,
             String sortField
     ) {
@@ -70,8 +71,8 @@ public class ReviewServiceImpl implements ReviewService {
         sort = sortDir == "desc" ? sort.descending() : sort.ascending()    ;
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
         Page<Review> reviewPage = null;
-        if (ratingStar != null) {
-            reviewPage = reviewRepository.findByRatingStar(ratingStar, baseProductId, pageable);
+        if (ratingStars != null && !ratingStars.isEmpty()) {
+            reviewPage = reviewRepository.findByRatingStar(ratingStars, baseProductId, pageable);
         }else {
             reviewPage = reviewRepository.findByProductId(baseProductId, pageable);
         }
@@ -83,21 +84,32 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewDto> reviewDtos = reviews.stream().map(review -> {
             String customerId = review.getCustomerId();
             Long productId = review.getProduct().getId();
-            ProductVariantDto product = findProductVariantById(productId);
+            String variant = getVariantById(productId);
             CustomerDto customerDto = customerFeignClient.getCustomerById(customerId).getBody();
-            return ReviewDto.fromModel(review, customerDto, product);
+            return ReviewDto.fromModel(review, customerDto, variant);
         }).toList();
 
         return new PageableData<>(pageNum, pageSize, totalElements, totalPages, reviewDtos);
     }
 
-    private ProductVariantDto findProductVariantById(Long productId) {
-        Product product = productRepository.findByIdCustom(productId).orElseThrow();
-        StoreDto store = null;
+    private String getVariantById(Long productId) {
+        String variant = "";
         List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
-        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
-        List<String> values = productAttributeValues.stream().map(productAttributeValue -> productAttributeValue.getValue()).toList();
-        return ProductVariantDto.fromModel(product, values, store);
+        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> {
+            Long productAttributeValueId = productVariation.getProductAttributeValue().getId();
+            ProductAttributeValue productAttributeValue = productAttributeValueRepository.findById(productAttributeValueId).orElseThrow();
+            return productAttributeValue;
+        }).toList();
+
+        for (int start = 0; start < productAttributeValues.size(); start++) {
+            if (start > 0) {
+                variant.concat(" . ");
+            }
+            ProductAttributeValue productAttributeValue = productAttributeValues.get(start);
+            ProductAttribute productAttribute = productAttributeValue.getProductAttribute();
+            variant.concat(productAttribute.getName()).concat(" : ").concat(productAttributeValue.getValue());
+        }
+        return variant;
     }
 
 
