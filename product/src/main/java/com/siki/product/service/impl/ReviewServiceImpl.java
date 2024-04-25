@@ -36,6 +36,8 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ProductVariationRepository productVariationRepository;
 
+    private final static String sortField = "createdAt";
+
     public ReviewServiceImpl(ReviewRepository reviewRepository, CustomerFeignClient customerFeignClient, ProductRepository productRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductVariationRepository productVariationRepository) {
         this.reviewRepository = reviewRepository;
         this.customerFeignClient = customerFeignClient;
@@ -59,22 +61,20 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public PageableData<ReviewDto> getByBaseProductId(
-            Long baseProductId,
+            String baseProductSlug,
             Integer pageNum,
             int pageSize,
             List<Integer> ratingStars,
-            String sortDir,
-            String sortField
+            String sortDir
     ) {
-
         Sort sort = Sort.by(sortField);
-        sort = sortDir == "desc" ? sort.descending() : sort.ascending()    ;
+        sort = sortDir.equals("desc") ? sort.descending() : sort.ascending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
         Page<Review> reviewPage = null;
         if (ratingStars != null && !ratingStars.isEmpty()) {
-            reviewPage = reviewRepository.findByRatingStar(ratingStars, baseProductId, pageable);
+            reviewPage = reviewRepository.findByRatingStar(ratingStars, baseProductSlug, pageable);
         }else {
-            reviewPage = reviewRepository.findByProductId(baseProductId, pageable);
+            reviewPage = reviewRepository.findByProductSlug(baseProductSlug, pageable);
         }
         List<Review> reviews = reviewPage.getContent();
 
