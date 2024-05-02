@@ -2,6 +2,7 @@ package com.siki.product.controller;
 
 import com.siki.product.dto.ErrorDto;
 import com.siki.product.dto.category.CategoryGetDto;
+import com.siki.product.dto.category.CategoryListDto;
 import com.siki.product.dto.category.CategoryPostDto;
 import com.siki.product.service.CategoryService;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -38,9 +41,9 @@ public class CategoryController {
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CategoryGetDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
-    public ResponseEntity<CategoryGetDto> listCategory(@Valid @RequestParam String categoryName) {
+    public ResponseEntity<List<CategoryListDto>> listCategoryToListDto() {
         // list all but return no content => ???
-        CategoryGetDto categoryGetDto = categoryService.listByName(categoryName);
-        return ResponseEntity.ok().body(categoryGetDto);
+        List<CategoryListDto> categoryListDtos = categoryService.listAllToListDto();
+        return ResponseEntity.ok().body(categoryListDtos);
     }
 }
