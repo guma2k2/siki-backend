@@ -52,4 +52,11 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             where c.name = :name
             """)
     Optional<Category> findByName(String name);
+
+    @Query("""
+            select c
+            from Category c
+            left join fetch c.parent
+            """)
+    List<Category> findAll();
 }
