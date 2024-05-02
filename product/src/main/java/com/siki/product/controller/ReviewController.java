@@ -1,13 +1,15 @@
-package com.siki.review.controller;
+package com.siki.product.controller;
 
-import com.siki.review.dto.PageableData;
-import com.siki.review.dto.ReviewDto;
-import com.siki.review.dto.ReviewPostDto;
-import com.siki.review.service.ReviewService;
-import com.siki.review.utils.Constants;
+import com.siki.product.dto.PageableData;
+import com.siki.product.dto.review.ReviewDto;
+import com.siki.product.dto.review.ReviewPostDto;
+import com.siki.product.service.ReviewService;
+import com.siki.product.utils.Constants;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class ReviewController {
@@ -24,21 +26,19 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/storefront/baseProduct/{id}")
+    @GetMapping("/storefront/baseProduct/{slug}")
     public ResponseEntity<PageableData<ReviewDto>> getByBaseProductId(
-            @PathVariable("id") Long baseProductId,
+            @PathVariable("slug") String baseProductSlug,
 
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER) int pageNum,
 
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE) int pageSize,
 
-            @RequestParam(value = "ratingStar", required = false) int ratingStar,
+            @RequestParam(value = "ratingStars", required = false) List<Integer> ratingStars,
 
-            @RequestParam(value = "sortDir", required = false) String sortDir,
-
-            @RequestParam(value = "sortField", required = false) String sortField
+            @RequestParam(value = "sortDir", required = false) String sortDir
     ) {
-        return ResponseEntity.ok().body(reviewService.getByBaseProductId(baseProductId, pageNum, pageSize, ratingStar,sortDir,sortField));
+        return ResponseEntity.ok().body(reviewService.getByBaseProductId(baseProductSlug, pageNum, pageSize, ratingStars,sortDir));
     }
 
 

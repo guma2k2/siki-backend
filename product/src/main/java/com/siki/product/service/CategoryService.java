@@ -24,4 +24,5 @@ public interface CategoryService {
     //CategoryGetDto listAllByName(String categoryName);
     List<CategoryListDto> listAllToListDto();
 
+    CategoryGetDto listByName(String categoryName);
 }

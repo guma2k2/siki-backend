@@ -28,6 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findByIdCustom(@Param("id") Long id);
 
 
+
+
     @Query("""
             select p
             from Product p
@@ -36,5 +38,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where bp.id = :baseProductId
             """)
     List<Product> findByBaseProductId(@Param("baseProductId") Long baseProductId);
+
+    @Query("""
+            select p
+            from Product p
+            join fetch p.baseProduct bp
+            left join fetch p.productImages
+            where bp.id = :baseProductId and p.isDefault = 1
+            """)
+    Optional<Product> findByBaseProductIsDefaultId(@Param("baseProductId") Long baseProductId);
 
 }

@@ -31,10 +31,10 @@ public class ProductServiceImpl implements ProductService {
     private final ProductVariationRepository productVariationRepository;
     private final ProductAttributeValueRepository productAttributeValueRepository;
     private final ProductAttributeRepository productAttributeRepository;
-
+    private final ReviewRepository reviewRepository;
     private final MediaFeignClient mediaFeignClient;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, MediaFeignClient mediaFeignClient) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, ReviewRepository reviewRepository, MediaFeignClient mediaFeignClient) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
@@ -43,6 +43,7 @@ public class ProductServiceImpl implements ProductService {
         this.productVariationRepository = productVariationRepository;
         this.productAttributeValueRepository = productAttributeValueRepository;
         this.productAttributeRepository = productAttributeRepository;
+        this.reviewRepository = reviewRepository;
         this.mediaFeignClient = mediaFeignClient;
     }
 
@@ -87,15 +88,7 @@ public class ProductServiceImpl implements ProductService {
         return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
     }
 
-    @Override
-    public ProductVariantDto findProductVariantById(Long productId) {
-        Product product = productRepository.findByIdCustom(productId).orElseThrow();
-        StoreDto store = null;
-        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
-        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
-        List<String> values = productAttributeValues.stream().map(productAttributeValue -> productAttributeValue.getValue()).toList();
-        return ProductVariantDto.fromModel(product, values, store);
-    }
+
 
     @Override
     public PageableData<BaseProductGetListDto> getProductByMultiQuery(String categoryName,
@@ -120,12 +113,12 @@ public class ProductServiceImpl implements ProductService {
         Page<BaseProduct> baseProducts = baseProductRepository.findByCategoryBrandPriceBetween(categoryName, brandNames, startPrice, endPrice, pageable);
         List<BaseProduct> baseProductList = baseProducts.getContent();
         List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
-            // Todo : get default attribute of baseProduct
-            String imgUrl = "";
-            Double price = 1000000.0;
-            float averageRating = 5;
+            Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
+            List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
+            // Todo soldNum in order service
+            float averageRating = getAverageRating(reviews);
             int soldNum = 0 ;
-            return BaseProductGetListDto.fromModel(baseProduct, imgUrl, price, averageRating,soldNum);
+            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
         }).toList();
         return new PageableData<BaseProductGetListDto>(
                 pageNum,
@@ -134,6 +127,10 @@ public class ProductServiceImpl implements ProductService {
                 baseProducts.getTotalPages(),
                 target
         );
+    }
+
+    private float getAverageRating(List<Review> reviews) {
+        return Math.round((float) reviews.stream().mapToInt(review -> review.getRatingStar()).sum() / reviews.size());
     }
 
 

@@ -23,7 +23,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Created", content = @Content(schema = @Schema(implementation = CategoryPostDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
@@ -33,13 +33,14 @@ public class CategoryController {
         return  ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/list")
+    @GetMapping
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CategoryGetDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
     public ResponseEntity<CategoryGetDto> listCategory(@Valid @RequestParam String categoryName) {
-        categoryService.listAllByName(categoryName);
-        return ResponseEntity.noContent().build();
+        // list all but return no content => ???
+        CategoryGetDto categoryGetDto = categoryService.listByName(categoryName);
+        return ResponseEntity.ok().body(categoryGetDto);
     }
 }
