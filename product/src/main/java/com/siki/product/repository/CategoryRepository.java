@@ -44,4 +44,11 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             """)
     List<Category> findByParentId(@Param("id") Integer id);
     Optional<Category> findByName(String name);
+
+    @Query("""
+            select c
+            from Category c
+            left join fetch c.parent
+            """)
+    List<Category> findAll();
 }
