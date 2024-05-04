@@ -41,6 +41,20 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public void removeCartOfLoggedUser() {
+        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        cartRepository.deleteCartByUser(customerId);
+    }
+
+    @Override
+    public CartDto findByProductAndUser(Long productId) {
+        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Cart cart = cartRepository.findByProductAndUser(productId, customerId).orElseThrow();
+        ProductVariantDto productVariantDto = productFeignClient.getByProductId(productId).getBody();
+        return CartDto.fromModel(cart, productVariantDto);
+    }
+
+    @Override
     public List<CartDto> getCartsForCustomer() {
         String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Cart> carts = cartRepository.findByUserId(customerId);
