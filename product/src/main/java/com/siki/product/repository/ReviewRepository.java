@@ -16,16 +16,16 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("""
             select r
-            from review r
+            from Review r
             left join fetch r.product p
             left join fetch p.baseProduct b
             where b.slug = :baseProductSlug
             """)
-    Page<Review> findByProductSlug(@Param("baseProductId") String baseProductSlug, Pageable pageable);
+    Page<Review> findByProductSlug(@Param("baseProductSlug") String baseProductSlug, Pageable pageable);
 
     @Query("""
             select r
-            from review r
+            from Review r
             left join fetch r.product p
             left join fetch p.baseProduct b
             where b.id = :baseProductId
@@ -35,7 +35,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("""
             select r
-            from review r
+            from Review r
             left join fetch r.product p
             left join fetch p.baseProduct b
             where b.slug = :baseProductSlug and r.ratingStar in :ratingStars

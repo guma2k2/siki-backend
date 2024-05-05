@@ -6,10 +6,10 @@ spring:
   application:
     name: "cart"
   datasource:
-    url: jdbc:mysql://localhost:3306/siki-cart
+    url: jdbc:mysql://localhost:3306/siki-user
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: '123456789'
+    password: '01268797378Zx'
   jpa:
     hibernate:
       ddl-auto: create-drop

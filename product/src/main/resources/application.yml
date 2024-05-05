@@ -9,7 +9,7 @@ spring:
     url: jdbc:mysql://localhost:3306/siki-product
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: '123456789'
+    password: '01268797378Zx'
   jpa:
     hibernate:
       ddl-auto: update
