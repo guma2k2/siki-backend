@@ -8,7 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart")
+@Table(name = "review")
 @Setter
 @Getter
 @AllArgsConstructor

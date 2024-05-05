@@ -44,7 +44,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             from Product p
             join fetch p.baseProduct bp
             left join fetch p.productImages
-            where bp.id = :baseProductId and p.isDefault = 1
+            where bp.id = :baseProductId and p.isDefault = true
             """)
     Optional<Product> findByBaseProductIsDefaultId(@Param("baseProductId") Long baseProductId);
 

@@ -75,9 +75,9 @@ public class ProductServiceImpl implements ProductService {
                     List<ProductAttributeValue> productAttributeValues = productAttribute.getProductAttributeValues();
                     List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
                         String image = "";
-                        if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
+                        /*if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
                             image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
-                        }
+                        }*/
                         return ProductAttributeValueDto.fromModel(productAttributeValue, image);
                     }).toList();
                     return ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
                                                                       Double endPrice,
                                                                       int ratingStar
     ) {
-        Pageable pageable = null;
+       /* Pageable pageable = null;
         if (sortDir != null && sortField != null) {
             Sort sort = Sort.by(sortField);
             sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
@@ -126,7 +126,8 @@ public class ProductServiceImpl implements ProductService {
                 baseProducts.getTotalElements(),
                 baseProducts.getTotalPages(),
                 target
-        );
+        );*/
+        return null;
     }
 
     private float getAverageRating(List<Review> reviews) {
@@ -187,10 +188,14 @@ public class ProductServiceImpl implements ProductService {
                 String image = "";
                 if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
                     image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
-                }
+               }
                 return ProductAttributeValueDto.fromModel(productAttributeValue, image);
             }).toList();
-            String image = mediaFeignClient.getUrlById(product.getImage()).getBody();
+
+             String image = "";
+             if (product.getImage() != "" && product.getImage() != null) {
+                 image = mediaFeignClient.getUrlById(product.getImage()).getBody();
+             }
             return ProductDto.fromModel(product, productImageDtos, productAttributeValueDtos, image);
         }).toList();
         return target;
