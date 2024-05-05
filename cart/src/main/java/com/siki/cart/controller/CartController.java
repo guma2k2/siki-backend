@@ -26,6 +26,18 @@ public class CartController {
         cartService.removeCartByCartId(cartId);
         return ResponseEntity.noContent().build();
     }
+    @DeleteMapping("/storefront")
+    public ResponseEntity<Void> removeCart() {
+        cartService.removeCartOfLoggedUser();
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/storefront/products/{productId}")
+    public ResponseEntity<CartDto> listCarts(
+            @PathVariable("productId") Long productId
+    ) {
+        return ResponseEntity.ok().body(cartService.findByProductAndUser(productId));
+    }
 
     @GetMapping("/storefront/carts")
     public ResponseEntity<List<CartDto>> listCarts() {
