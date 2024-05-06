@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
                                                                       Double endPrice,
                                                                       int ratingStar
     ) {
-       /* Pageable pageable = null;
+       Pageable pageable = null;
         if (sortDir != null && sortField != null) {
             Sort sort = Sort.by(sortField);
             sort = sortDir.equals("asc") ? sort.ascending() : sort.descending();
@@ -126,8 +126,7 @@ public class ProductServiceImpl implements ProductService {
                 baseProducts.getTotalElements(),
                 baseProducts.getTotalPages(),
                 target
-        );*/
-        return null;
+        );
     }
 
     private float getAverageRating(List<Review> reviews) {
