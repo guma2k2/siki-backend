@@ -11,6 +11,10 @@ public class DuplicatedException extends RuntimeException{
         this.message = MessageUtils.getMessage(errorCode, var2);
     }
 
+    public DuplicatedException(String message) {
+        this.message = message;
+    }
+
     @Override
     public String getMessage() {
         return message;

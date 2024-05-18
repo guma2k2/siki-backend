@@ -1,9 +1,11 @@
 package com.siki.product.controller;
 
 import com.siki.product.dto.ErrorDto;
+import com.siki.product.dto.category.CategoryDto;
 import com.siki.product.dto.category.CategoryGetDto;
 import com.siki.product.dto.category.CategoryListDto;
 import com.siki.product.dto.category.CategoryPostDto;
+import com.siki.product.model.Category;
 import com.siki.product.service.CategoryService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,12 +30,22 @@ public class CategoryController {
 
     @PostMapping
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Created", content = @Content(schema = @Schema(implementation = CategoryPostDto.class))),
+            @ApiResponse(responseCode = "200", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
     public ResponseEntity<Void> createCategory(@Valid @RequestBody CategoryPostDto categoryPostDto) {
         categoryService.create(categoryPostDto);
         return  ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Updated", content = @Content(schema = @Schema(implementation = CategoryPostDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
+    })
+    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryPostDto categoryPostDto, @RequestParam Integer id) {
+        CategoryDto categoryDto = categoryService.update(categoryPostDto, id);
+        return ResponseEntity.ok().body(categoryDto);
     }
 
     @GetMapping
@@ -42,8 +54,18 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
     public ResponseEntity<List<CategoryListDto>> listCategoryToListDto() {
-        // list all but return no content => ???
         List<CategoryListDto> categoryListDtos = categoryService.listAllToListDto();
         return ResponseEntity.ok().body(categoryListDtos);
     }
+
+    @DeleteMapping
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Deleted"),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
+    })
+    public ResponseEntity<Void> deleteCategory(@RequestParam Integer id) {
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
