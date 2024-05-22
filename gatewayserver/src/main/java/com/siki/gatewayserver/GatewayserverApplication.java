@@ -37,6 +37,18 @@ public class GatewayserverApplication {
 								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
 						)
 						.uri("lb://MEDIA")
+				).route(p -> p
+						.path("/api/orders/**")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)","/${segment}")
+								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
+						)
+						.uri("lb://ORDER")
+				).route(p -> p
+						.path("/api/carts/**")
+						.filters(f -> f.rewritePath("/api/(?<segment>.*)","/${segment}")
+								.addRequestHeader("X-Response-Time", LocalDateTime.now().toString())
+						)
+						.uri("lb://CART")
 				)
 				.build();
 	}
