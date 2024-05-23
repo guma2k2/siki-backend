@@ -28,7 +28,6 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
             from BaseProduct p
             left join fetch p.category c
             left join fetch p.brand b
-            where c.name = :categoryName and b.name in :brandNames
             """)
     Page<BaseProduct> findByCategoryBrandPriceBetween(@Param("categoryName") String categoryName,
                                                       @Param("brandNames") String[] brandNames,
