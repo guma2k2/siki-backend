@@ -1,10 +1,22 @@
 package com.siki.order.model;
-import com.siki.order.model.OrderDetail;
+import com.siki.order.enums.OrderStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "order")
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@Builder
 public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String receiverPhoneNumber;
     private String receiverAddress;
@@ -13,5 +25,6 @@ public class Order {
     private LocalDateTime createdAt;
     private OrderStatus status;
     private String userId;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails = new ArrayList<>();
 }

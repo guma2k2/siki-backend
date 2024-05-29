@@ -8,9 +8,7 @@ import java.util.List;
 public interface OrderService {
     void createOrder();
     List<OrderDto> findAll();
-
     OrderDto findById(Long orderId);
-
     List<OrderDto> findAllByUserId();
     List<OrderDto> findAllByUserAndStatus(OrderStatus status);
 
