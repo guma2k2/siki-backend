@@ -1,13 +1,9 @@
 package com.siki.product.service.impl;
 
-import com.siki.product.config.VNPayConfig;
 import com.siki.product.dto.PaymentDto;
-import com.siki.product.service.PaymentService;
-import com.siki.product.utils.VNPayUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
