@@ -12,7 +12,7 @@ spring:
     password: '01268797378Zx'
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
   security:
     oauth2:
@@ -31,4 +31,12 @@ info:
     name: "products"
     description: "Siki Product Application"
     version: "1.0.0"
-
+payment:
+  vnPay:
+    url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    tmnCode: "EDT2E52Y"
+    secretKey: "VGC6H4EJ834TXE5USIHM20W3FH4469VW"
+    returnUrl: "http://localhost:8090/api/products/payment/vn-pay-callback"
+    version: "2.1.0"
+    command: "pay"
+    orderType: "other"

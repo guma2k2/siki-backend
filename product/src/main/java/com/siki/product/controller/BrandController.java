@@ -41,7 +41,7 @@ public class BrandController {
         return ResponseEntity.ok().body(brandDto);
     }
 
-    @PutMapping
+    @DeleteMapping
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Deleted"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
