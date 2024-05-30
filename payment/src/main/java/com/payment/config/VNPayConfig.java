@@ -1,6 +1,6 @@
-package com.siki.product.config;
+package com.payment.config;
 
-import com.siki.product.utils.VNPayUtils;
+import com.payment.utils.VNPayUtils;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

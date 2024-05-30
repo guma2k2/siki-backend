@@ -10,6 +10,7 @@
         <module name="eurekaserver" />
         <module name="gatewayserver" />
         <module name="product" />
+        <module name="payment" />
         <module name="media" />
         <module name="user" />
         <module name="cart" />
@@ -27,6 +28,7 @@
       <module name="gatewayserver" options="-parameters" />
       <module name="media" options="-parameters" />
       <module name="order" options="-parameters" />
+      <module name="payment" options="-parameters" />
       <module name="product" options="-parameters" />
       <module name="review" options="-parameters" />
       <module name="user" options="-parameters" />

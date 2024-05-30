@@ -1,4 +1,4 @@
-package com.siki.product.utils;
+package com.payment.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
