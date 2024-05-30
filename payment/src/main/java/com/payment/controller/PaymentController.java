@@ -1,7 +1,7 @@
-package com.siki.product.controller;
+package com.payment.controller;
 
-import com.siki.product.dto.PaymentDto;
-import com.siki.product.service.PaymentService;
+import com.payment.dto.PaymentDto;
+import com.payment.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

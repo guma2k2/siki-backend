@@ -1,4 +1,4 @@
-package com.siki.product.dto;
+package com.payment.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

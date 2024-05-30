@@ -1,6 +1,6 @@
-package com.siki.product.service;
+package com.payment.service;
 
-import com.siki.product.dto.PaymentDto;
+import com.payment.dto.PaymentDto;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface PaymentService {
