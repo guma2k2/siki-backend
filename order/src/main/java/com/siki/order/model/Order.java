@@ -8,23 +8,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
 @Builder
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String receiverPhoneNumber;
+
     private String receiverAddress;
+
     private String receiverName;
+
     private String note;
+
     private LocalDateTime createdAt;
+
     private OrderStatus status;
+
     private String userId;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails = new ArrayList<>();
 }

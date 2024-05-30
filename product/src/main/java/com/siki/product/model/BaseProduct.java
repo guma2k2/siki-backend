@@ -27,7 +27,6 @@ public class BaseProduct {
     @Column(length = 512)
     private String description;
 
-
     private boolean status;
 
     @ManyToOne(fetch = FetchType.LAZY)

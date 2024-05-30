@@ -24,14 +24,14 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
     Optional<BaseProduct> findByIdCustom(@Param("id") Long id);
 
    @Query("""
-            select p
-            from BaseProduct p
-            left join fetch p.category c
-            left join fetch p.brand b
-            """)
-    Page<BaseProduct> findByCategoryBrandPriceBetween(@Param("categoryName") String categoryName,
-                                                      @Param("brandNames") String[] brandNames,
-                                                      @Param("startPrice") Double startPrice,
-                                                      @Param("endPrice") Double endPrice,
-                                                      Pageable pageable);
+           select p
+           from BaseProduct p
+           left join fetch p.category c
+           left join fetch p.brand b
+           where c.name = :categoryName and b.name in :brandNames
+           """)
+   Page<BaseProduct> findByCategoryBrand(@Param("categoryName") String categoryName,
+                                         @Param("brandNames") String[] brandNames,
+                                         Pageable pageable
+   );
 }
