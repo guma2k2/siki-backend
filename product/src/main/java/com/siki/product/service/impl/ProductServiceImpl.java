@@ -75,9 +75,9 @@ public class ProductServiceImpl implements ProductService {
                     List<ProductAttributeValue> productAttributeValues = productAttribute.getProductAttributeValues();
                     List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
                         String image = "";
-                        /*if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
+                        if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
                             image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
-                        }*/
+                        }
                         return ProductAttributeValueDto.fromModel(productAttributeValue, image);
                     }).toList();
                     return ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
@@ -88,7 +88,15 @@ public class ProductServiceImpl implements ProductService {
         return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
     }
 
-
+    @Override
+    public ProductVariantDto findProductVariantById(Long productId) {
+        Product product = productRepository.findByIdCustom(productId).orElseThrow();
+        StoreDto store = null;
+        List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
+        List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
+        List<String> values = productAttributeValues.stream().map(productAttributeValue -> productAttributeValue.getValue()).toList();
+        return ProductVariantDto.fromModel(product, values, store);
+    }
 
     @Override
     public PageableData<BaseProductGetListDto> getProductByMultiQuery(String categoryName,
@@ -110,14 +118,15 @@ public class ProductServiceImpl implements ProductService {
             pageable = PageRequest.of(pageNum, pageSize);
         }
 
-        Page<BaseProduct> baseProducts = baseProductRepository.findByCategoryBrandPriceBetween(categoryName, brandNames, startPrice, endPrice, pageable);
+        Page<BaseProduct> baseProducts = baseProductRepository.findByCategoryBrand(categoryName, brandNames, pageable);
         List<BaseProduct> baseProductList = baseProducts.getContent();
         List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
             Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
             List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
-            // Todo soldNum in order service
+
             float averageRating = getAverageRating(reviews);
             int soldNum = 0 ;
+            // Todo soldNum in order service
             return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
         }).toList();
         return new PageableData<BaseProductGetListDto>(

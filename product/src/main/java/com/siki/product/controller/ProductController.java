@@ -35,13 +35,13 @@ public class ProductController {
     public ResponseEntity<BaseProductDto> getProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getById(id));
     }
-//    @GetMapping("/storefront/products-variant/{id}")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
-//            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
-//    public ResponseEntity<ProductVariantDto> getByProductId(@PathVariable("id") Long id) {
-//        return ResponseEntity.ok(productService.findProductVariantById(id));
-//    }
+    @GetMapping("/storefront/products-variant/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
+    public ResponseEntity<ProductVariantDto> getByProductId(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(productService.findProductVariantById(id));
+    }
     @GetMapping("/storefront/products")
     public ResponseEntity<PageableData<BaseProductGetListDto>> getProductsByMultiQuery(
             @RequestParam(value = "categoryName", required = false) String categoryName,
