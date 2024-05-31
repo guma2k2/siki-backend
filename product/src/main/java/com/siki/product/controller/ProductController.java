@@ -28,7 +28,7 @@ public class ProductController {
         backoffice: admin
     */
 
-    @GetMapping("/storefront/products/{id}")
+    @GetMapping(value = {"/backoffice/products/{id}", "/storefront/products/{id}"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})

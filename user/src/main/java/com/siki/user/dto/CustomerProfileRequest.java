@@ -4,11 +4,11 @@ public record CustomerProfileRequest(
         String firstName,
         String lastName,
         String username ,
-        int day,
-        int month,
-        int year,
         String gender,
-        String sdt,
+        String phoneNumber,
+        String dateOfBirth,
+        String address,
+        String avatar,
         String email,
         String password
 ) {

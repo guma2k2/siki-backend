@@ -4,7 +4,10 @@ import com.siki.user.dto.CustomerPostDto;
 import com.siki.user.dto.CustomerProfileRequest;
 import com.siki.user.dto.UserDto;
 import com.siki.user.exception.AccessDeniedException;
+import com.siki.user.model.User;
+import com.siki.user.repository.UserRepository;
 import com.siki.user.utils.Constants;
+import com.siki.user.utils.DateUtils;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
@@ -33,11 +36,12 @@ public class UserServiceImpl implements UserService{
     @Value("${keycloak.resource}")
     private String adminClientId;
     private final static String CUSTOMER = "CUSTOMER";
-
     private final Keycloak keycloak;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(Keycloak keycloak) {
+    public UserServiceImpl(Keycloak keycloak, UserRepository userRepository) {
         this.keycloak = keycloak;
+        this.userRepository = userRepository;
     }
 
     public static CredentialRepresentation createPasswordCredentials(String password) {
@@ -57,24 +61,40 @@ public class UserServiceImpl implements UserService{
             RealmResource resource = keycloak.realm(realm);
             CredentialRepresentation credential = createPasswordCredentials(customerPostDto.password());
             UserRepresentation user = new UserRepresentation();
+            user.setEmail(customerPostDto.email());
             user.setFirstName(customerPostDto.firstName());
             user.setLastName(customerPostDto.lastName());
-            user.setEmail(customerPostDto.email());
-            user.setUsername(customerPostDto.username());
+            if (customerPostDto.username() == null) {
+                user.setUsername(customerPostDto.email());
+            }else {
+                user.setUsername(customerPostDto.username());
+            }
+
             user.setCredentials(Collections.singletonList(credential));
             user.setEnabled(true);
             Response response = resource.users().create(user);
 
+            log.info(response.getStatus() + "");
             // get new user
             if (Objects.equals(response.getStatus(),201)) {
                 String userId = CreatedResponseUtil.getCreatedId(response);
+
+                User customer = User.builder()
+                        .id(userId)
+                        .firstName(customerPostDto.firstName())
+                        .lastName(customerPostDto.lastName())
+                        .address(customerPostDto.address())
+                        .phoneNumber(customerPostDto.phoneNumber())
+                        .dateOfBirth(DateUtils.convertToLocalDateTime(customerPostDto.dateOfBirth()))
+                        .build();
+                userRepository.save(customer);
                 user.setId(userId);
                 UserResource userResource = resource.users().get(userId);
                 RoleRepresentation guestRealmRole = resource.roles().get(CUSTOMER).toRepresentation();
 
                 userResource.roles().realmLevel().add(Collections.singletonList(guestRealmRole));
 
-                return UserDto.fromUserRepresentation(user);
+                return UserDto.fromUserRepresentation(user, customer);
             }
             return null;
         } catch (ForbiddenException ex) {
@@ -87,7 +107,8 @@ public class UserServiceImpl implements UserService{
     public UserDto getCustomerProfile(String customerId) {
         try {
             UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
-            return UserDto.fromUserRepresentation(userRepresentation);
+            User user = userRepository.findById(customerId).orElseThrow();
+            return UserDto.fromUserRepresentation(userRepresentation, user);
         }catch (ForbiddenException ex) {
             throw new AccessDeniedException(String.format(Constants.ERROR_CODE.ACCESS_DENIED_ERROR_FORMAT,
                     ex.getMessage(), adminClientId));
@@ -102,9 +123,19 @@ public class UserServiceImpl implements UserService{
             RealmResource resource = keycloak.realm(realm);
             UserResource userResource = resource.users().get(customerId);
 
-            userRepresentation.setFirstName(customerProfileRequest.firstName());
-            userRepresentation.setLastName(customerProfileRequest.lastName());
             userRepresentation.setEmail(customerProfileRequest.email());
+            userRepresentation.setUsername(customerProfileRequest.username());
+            User oldUser = userRepository.findById(customerId).orElseThrow();
+
+            oldUser.setFirstName(customerProfileRequest.firstName());
+            oldUser.setLastName(customerProfileRequest.lastName());
+            oldUser.setAddress(customerProfileRequest.address());
+            oldUser.setPhoneNumber(customerProfileRequest.phoneNumber());
+            oldUser.setAvatar(customerProfileRequest.avatar());
+            oldUser.setDateOfBirth(DateUtils.convertToLocalDateTime(customerProfileRequest.dateOfBirth()));
+
+
+            userRepository.save(oldUser);
 
             if (customerProfileRequest.password() != null) {
                 userRepresentation.setCredentials(Collections.singletonList(createPasswordCredentials(customerProfileRequest.password())));
@@ -112,10 +143,8 @@ public class UserServiceImpl implements UserService{
             try {
                 userResource.update(userRepresentation);
             }catch (BadRequestException ex) {
-                log.error(ex.toString());
-                log.error(ex.getMessage());
             }
-            return UserDto.fromUserRepresentation(userRepresentation);
+            return UserDto.fromUserRepresentation(userRepresentation, oldUser);
         }  else {
             throw new RuntimeException();
         }

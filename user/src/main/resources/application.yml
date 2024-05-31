@@ -1,18 +1,19 @@
 server:
   port: 8081
   servlet:
-    context-path: '/carts'
+    context-path: '/users'
 spring:
   application:
-    name: "cart"
+    name: "user"
   datasource:
     url: jdbc:mysql://localhost:3306/siki-user
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: '01268797378Zx'
+#    password: '01268797378Zx'
+    password: '123456789'
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
   security:
     oauth2:
@@ -29,7 +30,7 @@ spring:
 info:
   app:
     name: "users"
-    description: "Siki Cart Service Application"
+    description: "Siki User Service Application"
     version: "1.0.0"
 
 keycloak:
