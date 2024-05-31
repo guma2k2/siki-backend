@@ -2,7 +2,7 @@ package com.siki.media.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.siki.media.MediaRepository;
+import com.siki.media.repository.MediaRepository;
 import com.siki.media.dto.MediaDto;
 import com.siki.media.enums.MediaEnum;
 import com.siki.media.exception.BadRequestException;

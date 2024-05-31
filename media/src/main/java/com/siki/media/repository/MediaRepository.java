@@ -1,4 +1,4 @@
-package com.siki.media;
+package com.siki.media.repository;
 
 import com.siki.media.model.Media;
 import org.springframework.data.jpa.repository.JpaRepository;

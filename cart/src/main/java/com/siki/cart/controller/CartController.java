@@ -15,7 +15,7 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @GetMapping("/storefront/add-to-cart/{productId}")
+    @PostMapping("/storefront/add-to-cart/{productId}")
     public ResponseEntity<Void> addToCart(@PathVariable("productId") Long productId) {
         cartService.addToCart(productId);
         return ResponseEntity.noContent().build();
@@ -39,7 +39,7 @@ public class CartController {
         return ResponseEntity.ok().body(cartService.findByProductAndUser(productId));
     }
 
-    @GetMapping("/storefront/carts")
+    @GetMapping("/storefront")
     public ResponseEntity<List<CartDto>> listCarts() {
         return ResponseEntity.ok().body(cartService.getCartsForCustomer());
     }

@@ -34,7 +34,8 @@ public class UserController {
         return ResponseEntity.ok().body(userDto);
     }
 
-    @PostMapping("/storefront/customer")
+    // sign-up api
+    @PostMapping("/storefront/signup")
     public ResponseEntity<UserDto> createCustomer (@RequestBody CustomerPostDto customerPostDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createCustomer(customerPostDto));
     }
