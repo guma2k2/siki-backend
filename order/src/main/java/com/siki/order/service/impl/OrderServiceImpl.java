@@ -10,6 +10,7 @@ import com.siki.order.service.OrderService;
 import com.siki.order.service.client.ProductFeignClient;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -92,5 +93,11 @@ public class OrderServiceImpl implements OrderService {
             return OrderDto.fromModel(order, orderDetailDtos);
         }).toList();
         return orderDtos;
+    }
+
+    @Override
+    @Transactional
+    public void updateStatusOrderById(Long orderId, OrderStatus orderStatus) {
+        orderRepository.updateStatusById(orderId, orderStatus   );
     }
 }

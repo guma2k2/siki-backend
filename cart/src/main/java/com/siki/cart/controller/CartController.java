@@ -39,12 +39,12 @@ public class CartController {
         return ResponseEntity.ok().body(cartService.findByProductAndUser(productId));
     }
 
-    @GetMapping("/storefront")
-    public ResponseEntity<List<CartDto>> listCarts() {
-        return ResponseEntity.ok().body(cartService.getCartsForCustomer());
+    @GetMapping("/storefront/{customerId}")
+    public ResponseEntity<List<CartDto>> listCarts(@PathVariable("customerId") String customerId) {
+        return ResponseEntity.ok().body(cartService.getCartsForCustomer(customerId));
     }
 
-    @PutMapping("/storefront/quantity/{cartId}")
+    @PutMapping("/storefront/{cartId}/quantity/{quantity}")
     public ResponseEntity<Void> updateQuantity(@PathVariable("cartId") Long cartId,
                                                @RequestParam("quantity") int quantity) {
         cartService.updateQuantity(cartId, quantity);

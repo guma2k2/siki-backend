@@ -41,13 +41,7 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
             });
             List<ProductAttributeValue> savedProductAttributeValues = productAttributeValueRepository.saveAllAndFlush(productAttributeValues);
             productAttribute.setProductAttributeValues(savedProductAttributeValues);
-            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
-                String image = "";
-                if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
-                    image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
-                }
-                return ProductAttributeValueDto.fromModel(productAttributeValue, image);
-            }).toList();
+            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
             ProductAttributeDto productAttributeDto = ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
             target.add(productAttributeDto);
         });

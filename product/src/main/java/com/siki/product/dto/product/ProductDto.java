@@ -19,17 +19,15 @@ public record ProductDto (
 ) {
     public static ProductDto fromModel(Product product,
                                        List<ProductImageDto> productImages,
-                                       List<ProductAttributeValueDto> productAttributeValues,
-                                       String image
+                                       List<ProductAttributeValueDto> productAttributeValues
     ) {
-        // Todo : get image in media service
         return new ProductDto(
                 product.getId(),
                 product.isStatus(),
                 product.getQuantity(),
                 product.getPrice(),
                 product.isDefault(),
-                image,
+                product.getImage(),
                 productImages,
                 productAttributeValues
         );

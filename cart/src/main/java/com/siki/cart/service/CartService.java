@@ -11,7 +11,7 @@ public interface CartService {
     void removeCartOfLoggedUser();
 
     CartDto findByProductAndUser(Long productId);
-    List<CartDto> getCartsForCustomer();
+    List<CartDto> getCartsForCustomer(String customerId);
     void updateQuantity(Long CartId, int quantity);
     void updateSelected(Long cartId, boolean isSelected);
 

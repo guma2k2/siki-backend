@@ -32,9 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductAttributeValueRepository productAttributeValueRepository;
     private final ProductAttributeRepository productAttributeRepository;
     private final ReviewRepository reviewRepository;
-    private final MediaFeignClient mediaFeignClient;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, ReviewRepository reviewRepository, MediaFeignClient mediaFeignClient) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, ReviewRepository reviewRepository) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
@@ -44,7 +43,6 @@ public class ProductServiceImpl implements ProductService {
         this.productAttributeValueRepository = productAttributeValueRepository;
         this.productAttributeRepository = productAttributeRepository;
         this.reviewRepository = reviewRepository;
-        this.mediaFeignClient = mediaFeignClient;
     }
 
 
@@ -73,13 +71,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductAttributeDto> productAttributeDtos =
                 productAttributes.stream().map(productAttribute -> {
                     List<ProductAttributeValue> productAttributeValues = productAttribute.getProductAttributeValues();
-                    List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
-                        String image = "";
-                        if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
-                            image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
-                        }
-                        return ProductAttributeValueDto.fromModel(productAttributeValue, image);
-                    }).toList();
+                    List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
                     return ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
                 }).toList();
         List<ProductDto> productVariants = getProductVariantsById(baseProductId);
@@ -90,8 +82,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductVariantDto findProductVariantById(Long productId) {
-        Product product = productRepository.findByIdCustom(productId).orElseThrow();
+        Product product = productRepository.findByIdCustom(productId).orElseThrow(() -> new NotFoundException("product not found"));
         StoreDto store = null;
+        if (productId % 2L == 0) {
+            store = new StoreDto(1, "Tiki shop");
+        } else {
+            store = new StoreDto(2, "My store");
+        }
         List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
         List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
         List<String> values = productAttributeValues.stream().map(productAttributeValue -> productAttributeValue.getValue()).toList();
@@ -186,25 +183,11 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findByBaseProductId(baseProductId);
         List<ProductDto> target = products.stream().map(product -> {
             Long productId = product.getId();
-            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(productImage -> {
-                String url = mediaFeignClient.getUrlById(productImage.getUrl()).getBody();
-                return ProductImageDto.fromModel(productImage, url);
-            }).toList();
+            List<ProductImageDto> productImageDtos = product.getProductImages().stream().map(ProductImageDto::fromModel).toList();
             List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
             List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(ProductVariation::getProductAttributeValue).toList();
-            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(productAttributeValue -> {
-                String image = "";
-                if (productAttributeValue.getImage() != "" && productAttributeValue.getImage() != null) {
-                    image = mediaFeignClient.getUrlById(productAttributeValue.getImage()).getBody();
-               }
-                return ProductAttributeValueDto.fromModel(productAttributeValue, image);
-            }).toList();
-
-             String image = "";
-             if (product.getImage() != "" && product.getImage() != null) {
-                 image = mediaFeignClient.getUrlById(product.getImage()).getBody();
-             }
-            return ProductDto.fromModel(product, productImageDtos, productAttributeValueDtos, image);
+            List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
+            return ProductDto.fromModel(product, productImageDtos, productAttributeValueDtos);
         }).toList();
         return target;
     }

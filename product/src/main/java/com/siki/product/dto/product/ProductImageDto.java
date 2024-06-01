@@ -7,10 +7,9 @@ public record ProductImageDto (
         String url
 ) {
 
-    public static ProductImageDto fromModel(ProductImage productImage, String url) {
+    public static ProductImageDto fromModel(ProductImage productImage) {
         return new ProductImageDto(
-                productImage.getId(),
-                url
+                productImage.getId(), productImage.getUrl()
         );
     }
 }
