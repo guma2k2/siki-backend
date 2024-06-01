@@ -16,7 +16,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     @Query("""
             select c
             from Cart c
-            where c.productId = :productId AND c.userid = :userId
+            where c.productId = :productId AND c.userId = :userId
             """)
     Optional<Cart> findByProductAndUser(@Param("productId") Long productId,
                                         @Param("userId") String userId);
@@ -24,7 +24,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     @Query("""
             update Cart c
-            set (c.quantity = :quantity)
+            set c.quantity = :quantity
             where c.id = :cartId
             """)
     @Modifying
@@ -32,9 +32,9 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
                         @Param("quantity") int quantity);
 
     @Query("""
-            update Cart c
-            set (c.selected = :selected)
-            where c.id = :cartId
+            UPDATE Cart c
+            SET c.selected = :selected
+            WHERE c.id = :cartId
             """)
     @Modifying
     void updateSelected(@Param("cartId") Long cartId,

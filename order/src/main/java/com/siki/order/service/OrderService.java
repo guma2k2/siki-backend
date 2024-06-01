@@ -12,5 +12,5 @@ public interface OrderService {
     OrderDto findById(Long orderId);
     List<OrderDto> findAllByUserId();
     List<OrderDto> findAllByUserAndStatus(OrderStatus status);
-
+    void updateStatusOrderById(Long orderId, OrderStatus orderStatus);
 }

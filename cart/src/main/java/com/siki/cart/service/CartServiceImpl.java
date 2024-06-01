@@ -31,6 +31,14 @@ public class CartServiceImpl implements CartService {
         if (cart.isPresent()) {
             int currentQuantity = cart.get().getQuantity();
             cartRepository.updateQuantity(cart.get().getId(), currentQuantity + 1);
+        }else {
+            Cart newCart = Cart.builder()
+                    .quantity(1)
+                    .productId(productId)
+                    .userId(customerId)
+                    .selected(false)
+                    .build();
+            cartRepository.save(newCart);
         }
     }
 
@@ -55,8 +63,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartDto> getCartsForCustomer() {
-        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
+    public List<CartDto> getCartsForCustomer(String customerId) {
         List<Cart> carts = cartRepository.findByUserId(customerId);
         List<CartDto> cartDtos = carts.stream().map(cart -> {
             Long productId = cart.getProductId();

@@ -37,4 +37,12 @@ public class OrderController {
         List<OrderDto> orderDtos = orderService.findAllByUserAndStatus(orderStatus);
         return ResponseEntity.ok().body(orderDtos);
     }
+    @PutMapping("/storefront/{orderId}/status/{orderStatus}")
+    public ResponseEntity<Void> updateStatusOrderById(
+            @PathVariable("orderId") Long orderId,
+            @RequestParam OrderStatus orderStatus
+    ) {
+        orderService.updateStatusOrderById(orderId, orderStatus);
+        return ResponseEntity.noContent().build();
+    }
 }

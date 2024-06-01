@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "medias", url = "http://localhost:8090/api/products")
+@FeignClient(name = "products", url = "http://localhost:8090/api/products")
 public interface ProductFeignClient {
 
      @GetMapping("/storefront/products-variant/{id}")

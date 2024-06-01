@@ -9,7 +9,7 @@ public record ProductAttributeValueDto(
         Long attributeId
 ) {
 
-    public static  ProductAttributeValueDto fromModel(ProductAttributeValue productAttributeValue, String image) {
-        return new ProductAttributeValueDto(productAttributeValue.getId(), productAttributeValue.getValue(), image, productAttributeValue.getProductAttribute().getId());
+    public static  ProductAttributeValueDto fromModel(ProductAttributeValue productAttributeValue) {
+        return new ProductAttributeValueDto(productAttributeValue.getId(), productAttributeValue.getValue(), productAttributeValue.getImage(), productAttributeValue.getProductAttribute().getId());
     }
 }
