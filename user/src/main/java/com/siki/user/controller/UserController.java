@@ -28,7 +28,7 @@ public class UserController {
 
     @GetMapping("/storefront/customer/{id}")
     public ResponseEntity<UserDto> getCustomerById(
-            @RequestParam("id") String id
+            @PathVariable("id") String id
     ) {
         UserDto userDto = userService.getCustomerProfile(id);
         return ResponseEntity.ok().body(userDto);

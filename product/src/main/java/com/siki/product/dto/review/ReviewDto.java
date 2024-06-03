@@ -18,8 +18,9 @@ public record ReviewDto (
                                       CustomerDto customer,
                                       String variant
                                       ) {
+        String updatedAt = review.getUpdatedAt() != null ? review.getUpdatedAt().toString() : "";
         return new ReviewDto(
-                review.getId(), review.getContent(), review.getRatingStar(), customer, variant, review.getCreatedAt().toString(), review.getUpdatedAt().toString()
+                review.getId(), review.getContent(), review.getRatingStar(), customer, variant, review.getCreatedAt().toString(), updatedAt
         );
     }
 }

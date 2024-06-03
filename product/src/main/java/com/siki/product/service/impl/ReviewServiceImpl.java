@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -55,6 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .ratingStar(reviewPost.ratingStar())
                 .product(product)
                 .customerId(customerId)
+                .createdAt(LocalDateTime.now())
                 .build();
         reviewRepository.save(review);
     }
@@ -93,7 +95,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private String getVariantById(Long productId) {
-        String variant = "";
+        StringBuilder variant = new StringBuilder();
         List<ProductVariation> productVariations = productVariationRepository.findByProductId(productId);
         List<ProductAttributeValue> productAttributeValues = productVariations.stream().map(productVariation -> {
             Long productAttributeValueId = productVariation.getProductAttributeValue().getId();
@@ -103,13 +105,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         for (int start = 0; start < productAttributeValues.size(); start++) {
             if (start > 0) {
-                variant.concat(" . ");
+                variant.append(" . ");
             }
             ProductAttributeValue productAttributeValue = productAttributeValues.get(start);
             ProductAttribute productAttribute = productAttributeValue.getProductAttribute();
-            variant.concat(productAttribute.getName()).concat(" : ").concat(productAttributeValue.getValue());
+            variant.append((productAttribute.getName()).concat(" : ")).append(productAttributeValue.getValue());
         }
-        return variant;
+        return variant.toString();
     }
 
 

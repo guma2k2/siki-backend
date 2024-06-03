@@ -15,6 +15,8 @@ import jakarta.ws.rs.GET;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 @RestController
 public class ProductController {
 
@@ -45,7 +47,7 @@ public class ProductController {
     @GetMapping("/storefront/products")
     public ResponseEntity<PageableData<BaseProductGetListDto>> getProductsByMultiQuery(
             @RequestParam(value = "categoryName", required = false) String categoryName,
-            @RequestParam(value = "brandNames", required = false) String[] brandNames,
+            @RequestParam(value = "brandNames", defaultValue = "") String[] brandNames,
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortDir", required = false) String sortDir,
