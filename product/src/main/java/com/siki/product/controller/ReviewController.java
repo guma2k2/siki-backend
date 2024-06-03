@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -36,7 +37,7 @@ public class ReviewController {
 
             @RequestParam(value = "ratingStars", required = false) List<Integer> ratingStars,
 
-            @RequestParam(value = "sortDir", required = false) String sortDir
+            @RequestParam(value = "sortDir", defaultValue = Constants.PageableConstant.DEFAULT_SORT_DIR) String sortDir
     ) {
         return ResponseEntity.ok().body(reviewService.getByBaseProductId(baseProductSlug, pageNum, pageSize, ratingStars,sortDir));
     }

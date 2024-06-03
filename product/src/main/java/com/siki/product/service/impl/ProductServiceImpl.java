@@ -117,6 +117,13 @@ public class ProductServiceImpl implements ProductService {
 
         Page<BaseProduct> baseProducts = baseProductRepository.findByCategoryBrand(categoryName, brandNames, pageable);
         List<BaseProduct> baseProductList = baseProducts.getContent();
+        if (startPrice != null && endPrice != null) {
+            baseProductList = baseProductList.stream()
+                    .filter(baseProduct -> baseProduct.getProducts().stream()
+                            .anyMatch(product -> product.isDefault() && product.getPrice() >= startPrice && product.getPrice() <= endPrice))
+                    .toList();
+
+        }
         List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
             Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
             List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
