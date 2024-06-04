@@ -3,6 +3,7 @@ package com.siki.order.controller;
 import com.siki.order.dto.OrderDto;
 import com.siki.order.dto.OrderPostDto;
 import com.siki.order.enums.OrderStatus;
+import com.siki.order.service.OrderDetailService;
 import com.siki.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +15,11 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    public OrderController(OrderService orderService) {
+    private final OrderDetailService orderDetailService;
+
+    public OrderController(OrderService orderService, OrderDetailService orderDetailService) {
         this.orderService = orderService;
+        this.orderDetailService = orderDetailService;
     }
 
     @PostMapping("/storefront")
@@ -28,6 +32,12 @@ public class OrderController {
     public ResponseEntity<List<OrderDto>> findAllByUserId() {
         List<OrderDto> orderDtos = orderService.findAllByUserId();
         return ResponseEntity.ok().body(orderDtos);
+    }
+    @GetMapping("/storefront/sold-num/product/{productId}")
+    public ResponseEntity<Long> getSoldNumByProduct(
+            @PathVariable("productId") Long productId
+    ) {
+        return ResponseEntity.ok().body(orderDetailService.getSoldNumByProduct(productId));
     }
 
     @GetMapping("/storefront/status/{orderStatus}")

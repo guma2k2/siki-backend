@@ -7,7 +7,7 @@ import com.siki.product.exception.*;
 import com.siki.product.model.*;
 import com.siki.product.repository.*;
 import com.siki.product.service.ProductService;
-import com.siki.product.service.client.MediaFeignClient;
+import com.siki.product.service.client.OrderFeignClient;
 import com.siki.product.utils.Constants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -33,7 +34,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductAttributeRepository productAttributeRepository;
     private final ReviewRepository reviewRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, ReviewRepository reviewRepository) {
+    private final OrderFeignClient orderFeignClient;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository, BrandRepository brandRepository, BaseProductRepository baseProductRepository, CategoryRepository categoryRepository, ProductVariationRepository productVariationRepository, ProductAttributeValueRepository productAttributeValueRepository, ProductAttributeRepository productAttributeRepository, ReviewRepository reviewRepository, OrderFeignClient orderFeignClient) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.brandRepository = brandRepository;
@@ -43,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
         this.productAttributeValueRepository = productAttributeValueRepository;
         this.productAttributeRepository = productAttributeRepository;
         this.reviewRepository = reviewRepository;
+        this.orderFeignClient = orderFeignClient;
     }
 
 
@@ -129,8 +133,12 @@ public class ProductServiceImpl implements ProductService {
             List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
 
             float averageRating = getAverageRating(reviews);
-            int soldNum = 0 ;
-            // Todo soldNum in order service
+            long soldNum = 0 ;
+
+            Optional<Product> defaultProduct = baseProduct.getProducts().stream().filter(product1 -> product1.isDefault()).findFirst();
+            if (defaultProduct.isPresent())  {
+                soldNum = orderFeignClient.getSoldNumByProduct(defaultProduct.get().getId()).getBody();
+            }
             return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
         }).toList();
         return new PageableData<BaseProductGetListDto>(
