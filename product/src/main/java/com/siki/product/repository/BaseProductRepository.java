@@ -1,6 +1,7 @@
 package com.siki.product.repository;
 
 import com.siki.product.model.BaseProduct;
+import com.siki.product.model.Brand;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,13 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
                                          @Param("brandNames") String[] brandNames,
                                          Pageable pageable
    );
+
+
+   @Query("""
+           select distinct br
+           from BaseProduct b
+           left join fetch b.brand br
+           where b in :baseProducts
+           """)
+   List<Brand> findDistinctBrandInListBaseProduct(@Param("baseProducts") List<BaseProduct> baseProducts);
 }
