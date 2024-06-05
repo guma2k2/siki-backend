@@ -37,11 +37,6 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
    );
 
 
-   @Query("""
-           select distinct br
-           from BaseProduct b
-           left join fetch b.brand br
-           where b in :baseProducts
-           """)
-   List<Brand> findDistinctBrandInListBaseProduct(@Param("baseProducts") List<BaseProduct> baseProducts);
+
+
 }

@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/brand")
 public class BrandController {
     private final BrandService brandService;
 
@@ -21,7 +20,7 @@ public class BrandController {
         this.brandService = brandService;
     }
 
-    @PostMapping
+    @PostMapping("/backoffice/brand")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
@@ -31,22 +30,22 @@ public class BrandController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
+    @PutMapping("/backoffice/brand/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Updated", content = @Content(schema = @Schema(implementation = BrandPostDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
-    public ResponseEntity<BrandDto> updateBrand(@Valid @RequestBody BrandPostDto brandPostDto, @RequestParam Integer id) {
+    public ResponseEntity<BrandDto> updateBrand(@Valid @RequestBody BrandPostDto brandPostDto, @PathVariable("id") Integer id) {
         BrandDto brandDto = brandService.update(brandPostDto, id);
         return ResponseEntity.ok().body(brandDto);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/backoffice/brand/{id}")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Deleted"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
-    public ResponseEntity<Void> deletedBrand(@RequestParam Integer id) {
+    public ResponseEntity<Void> deletedBrand(@PathVariable Integer id) {
         brandService.delete(id);
         return ResponseEntity.noContent().build();
     }
