@@ -16,10 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -108,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
                                                                       String sortField,
                                                                       Double startPrice,
                                                                       Double endPrice,
-                                                                      int ratingStar
+                                                                      int[] ratingStars
     ) {
        Pageable pageable = null;
         if (sortDir != null && sortField != null) {
@@ -118,7 +115,9 @@ public class ProductServiceImpl implements ProductService {
         }else {
             pageable = PageRequest.of(pageNum, pageSize);
         }
-
+        if (brandNames == null) {
+            brandNames = new String[]{};
+        }
         Page<BaseProduct> baseProducts = baseProductRepository.findByCategoryBrand(categoryName, brandNames, pageable);
         List<BaseProduct> baseProductList = baseProducts.getContent();
         if (startPrice != null && endPrice != null) {
@@ -128,6 +127,20 @@ public class ProductServiceImpl implements ProductService {
                     .toList();
 
         }
+        if (ratingStars != null) {
+            Arrays.stream(ratingStars).sorted();
+            baseProductList = baseProductList.stream()
+                    .filter(baseProduct -> {
+                        List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
+                        float averageRating = getAverageRating(reviews);
+                        if (averageRating > ratingStars[0]) {
+                            return true;
+                        } else {
+                            return false ;
+                        }
+                    }).toList();
+        }
+
         List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
             Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
             List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());

@@ -8,12 +8,14 @@ import com.siki.product.dto.product.BaseProductGetListDto;
 import com.siki.product.exception.DuplicatedException;
 import com.siki.product.exception.NotFoundException;
 import com.siki.product.model.BaseProduct;
+import com.siki.product.model.Brand;
 import com.siki.product.model.Category;
 import com.siki.product.repository.CategoryRepository;
 import com.siki.product.service.CategoryService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -25,15 +27,18 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void create(CategoryPostDto categoryPostDto) {
-        Category categoryFound = categoryRepository.findByName(categoryPostDto.name()).orElseThrow();
-        if (categoryFound != null)
+        Optional<Category> categoryFound = categoryRepository.findByName(categoryPostDto.name());
+        if (categoryFound.isPresent()){
             throw new DuplicatedException("Category name already exist");
+        }
+
         Category category = Category.builder()
                 .name(categoryPostDto.name())
                 .image(categoryPostDto.image())
                 .description(categoryPostDto.description())
-                .parent(categoryRepository.findById(categoryPostDto.categoryParentId()).orElseThrow())
+                .status(true)
                 .build();
+
         if (categoryPostDto.categoryParentId() != null) {
             Category parent = categoryRepository.findById(categoryPostDto.categoryParentId()).orElseThrow();
             category.setParent(parent);
@@ -90,34 +95,11 @@ public class CategoryServiceImpl implements CategoryService {
 
         List<Category> categoryList = category.getChildrenList();
         List<CategoryDto> categoryDtos = categoryList.stream().map(CategoryDto::fromModel).toList();
-
         List<BaseProduct> baseProductList = category.getProductList();
-        List<BaseProductGetListDto> baseProductGetListDtos = baseProductList.stream().map(baseProduct -> {
-            String url = "";
-            Double price = 1000000.0;
-            float averageRating = 5;
-            int soldNum = 0 ;
-            return BaseProductGetListDto.fromModel(baseProduct, url, price, averageRating, soldNum);
-        }).toList();
-        return new CategoryGetDto(categoryDtos, baseProductGetListDtos);
+        List<Brand> brands = baseProductList.stream().map(baseProduct -> baseProduct.getBrand()).distinct().toList();
+        List<String> brandNames = brands.stream().map(Brand::getName).toList();
+        return new CategoryGetDto(categoryDtos, brandNames);
     }
 
-//    @Override
-//    public CategoryGetDto listAllByName(String categoryName) {
-//        Category category = categoryRepository.findByName(categoryName).orElseThrow();
-//
-//        List<Category> categoryList = category.getChildrenList();
-//        List<CategoryDto> categoryDtos = categoryList.stream().map(CategoryDto::fromModel).toList();
-//
-//        List<BaseProduct> baseProductList = category.getProductList();
-//        List<BaseProductGetListDto> baseProductGetListDtos = baseProductList.stream().map(baseProduct -> {
-//            String url = "";
-//            Double price = 1000000.0;
-//            float averageRating = 5;
-//            int soldNum = 0 ;
-//            return BaseProductGetListDto.fromModel(baseProduct, url, price, averageRating, soldNum);
-//        }).toList();
-//        return new CategoryGetDto(categoryDtos, baseProductGetListDtos);
-//    }
 
 }

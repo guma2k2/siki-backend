@@ -6,6 +6,6 @@ import java.util.List;
 
 public record CategoryGetDto(
         List<CategoryDto> categoryChildrens,
-        List<BaseProductGetListDto> products
+        List<String> brands
 ) {
 }

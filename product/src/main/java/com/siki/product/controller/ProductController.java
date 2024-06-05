@@ -50,13 +50,13 @@ public class ProductController {
             @RequestParam(value = "brandNames", defaultValue = "") String[] brandNames,
             @RequestParam(value = "pageNum", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_NUMBER, required = false) int pageNum,
             @RequestParam(value = "pageSize", defaultValue = Constants.PageableConstant.DEFAULT_PAGE_SIZE, required = false) int pageSize,
-            @RequestParam(value = "sortDir", required = false) String sortDir,
-            @RequestParam(value = "sortField", required = false) String sortField,
+            @RequestParam(value = "sortDir", defaultValue = Constants.PageableConstant.DEFAULT_SORT_DIR, required = false) String sortDir,
+            @RequestParam(value = "sortField", defaultValue = Constants.PageableConstant.DEFAULT_SORT_FIELD, required = false) String sortField,
             @RequestParam(value = "startPrice", required = false) Double startPrice,
             @RequestParam(value = "endPrice", required = false) Double endPrice,
-            @RequestParam(value = "ratingStar", required = false) int ratingStar
+            @RequestParam(value = "ratingStar", required = false) int[] ratingStars
     ) {
-        return ResponseEntity.ok().body(productService.getProductByMultiQuery(categoryName, brandNames, pageNum, pageSize, sortDir, sortField, startPrice, endPrice, ratingStar));
+        return ResponseEntity.ok().body(productService.getProductByMultiQuery(categoryName, brandNames, pageNum, pageSize, sortDir, sortField, startPrice, endPrice, ratingStars));
     }
 
     @PostMapping("/backoffice/products")
