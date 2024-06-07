@@ -4,6 +4,6 @@ import java.util.List;
 
 public record ProductAttributePostDto (
         String name,
-        List<String> productAttributeValues
+        List<ProductAttributeValuePostDto> productAttributeValues
 ) {
 }

@@ -9,6 +9,7 @@ import com.siki.product.repository.*;
 import com.siki.product.service.ProductService;
 import com.siki.product.service.client.OrderFeignClient;
 import com.siki.product.utils.Constants;
+import com.siki.product.utils.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,10 +51,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void create(BaseProductPostDto baseProductPostDto) {
-        // Todo : check exist slug
+        if (isBaseProductNameExisted(baseProductPostDto.name())) {
+            throw new DuplicatedException(Constants.ERROR_CODE.PRODUCT_NAME_IS_EXISTED);
+        }
         BaseProduct baseProduct = BaseProduct.builder()
                 .name(baseProductPostDto.name())
-                .slug(baseProductPostDto.slug())
+                .slug(StringUtils.toSlug(baseProductPostDto.name()))
                 .description(baseProductPostDto.description())
                 .storeId(baseProductPostDto.storeId())
                 .status(false)
@@ -163,6 +166,42 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    @Override
+    public BaseProductDto getBySlug(String slug) {
+        BaseProduct baseProduct = baseProductRepository.findBySlug(slug).orElseThrow();
+        Long baseProductId = baseProduct.getId();
+        List<ProductAttribute> productAttributes = productAttributeRepository.findByBaseProductId(baseProductId);
+        List<ProductAttributeDto> productAttributeDtos =
+                productAttributes.stream().map(productAttribute -> {
+                    List<ProductAttributeValue> productAttributeValues = productAttribute.getProductAttributeValues();
+                    List<ProductAttributeValueDto> productAttributeValueDtos = productAttributeValues.stream().map(ProductAttributeValueDto::fromModel).toList();
+                    return ProductAttributeDto.fromModel(productAttribute, productAttributeValueDtos);
+                }).toList();
+        List<ProductDto> productVariants = getProductVariantsById(baseProductId);
+        List<String> breadcrumb = getBreadcrumb(baseProduct.getCategory().getId(), baseProduct.getName());
+        StoreDto storeDto = null;
+        return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
+    }
+
+    @Override
+    public List<BaseProductGetListDto> getByCategory(Integer categoryId) {
+        List<BaseProduct> baseProductList = baseProductRepository.findByCategoryId(categoryId);
+        List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
+            Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
+            List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
+
+            float averageRating = getAverageRating(reviews);
+            long soldNum = 0 ;
+
+            Optional<Product> defaultProduct = baseProduct.getProducts().stream().filter(product1 -> product1.isDefault()).findFirst();
+            if (defaultProduct.isPresent())  {
+                soldNum = orderFeignClient.getSoldNumByProduct(defaultProduct.get().getId()).getBody();
+            }
+            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
+        }).toList();
+        return target;
+    }
+
     private float getAverageRating(List<Review> reviews) {
         return Math.round((float) reviews.stream().mapToInt(review -> review.getRatingStar()).sum() / reviews.size());
     }
@@ -181,13 +220,14 @@ public class ProductServiceImpl implements ProductService {
         productPosts.forEach(productDto -> {
             Product product = Product.builder()
                     .status(true)
+                    .isDefault(productDto.isDefault())
                     .image(productDto.image())
                     .baseProduct(baseProduct)
                     .quantity(productDto.quantity())
                     .price(productDto.price())
                     .build();
             productRepository.saveAndFlush(product);
-            setProductImages(product, productDto.productImageIds());
+            setProductImages(product, productDto.productImages());
             setProductAttributeValues(product, productDto.productOptionValueIds());
         });
     }
@@ -255,5 +295,10 @@ public class ProductServiceImpl implements ProductService {
         Brand brand = brandRepository.findById(brandId).orElseThrow(() ->
                 new NotFoundException(Constants.ERROR_CODE.BRAND_NOT_FOUND, brandId));
         baseProduct.setBrand(brand);
+    }
+
+
+    private boolean isBaseProductNameExisted(String name) {
+        return baseProductRepository.findByName(name).isPresent();
     }
 }

@@ -8,7 +8,6 @@ import java.util.List;
 
 public record BaseProductPostDto(
         String name,
-        String slug,
         String description,
         boolean status,
         Integer storeId,
