@@ -71,6 +71,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public BaseProductDto getById(Long baseProductId) {
         BaseProduct baseProduct = baseProductRepository.findByIdCustom(baseProductId).orElseThrow();
+        Integer categoryId = baseProduct.getCategory().getId();
+        List<BaseProduct> baseProductList = baseProductRepository.findByCategoryId(categoryId);
+        List<BaseProductGetListDto> relatedProducts = getBaseProductGetListDto(baseProductList);
         List<ProductAttribute> productAttributes = productAttributeRepository.findByBaseProductId(baseProductId);
         List<ProductAttributeDto> productAttributeDtos =
                 productAttributes.stream().map(productAttribute -> {
@@ -81,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDto> productVariants = getProductVariantsById(baseProductId);
         List<String> breadcrumb = getBreadcrumb(baseProduct.getCategory().getId(), baseProduct.getName());
         StoreDto storeDto = null;
-        return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
+        return BaseProductDto.fromModel(baseProduct, storeDto, productAttributeDtos  , productVariants, breadcrumb, relatedProducts);
     }
 
     @Override
@@ -144,19 +147,7 @@ public class ProductServiceImpl implements ProductService {
                     }).toList();
         }
 
-        List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
-            Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
-            List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
-
-            float averageRating = getAverageRating(reviews);
-            long soldNum = 0 ;
-
-            Optional<Product> defaultProduct = baseProduct.getProducts().stream().filter(product1 -> product1.isDefault()).findFirst();
-            if (defaultProduct.isPresent())  {
-                soldNum = orderFeignClient.getSoldNumByProduct(defaultProduct.get().getId()).getBody();
-            }
-            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
-        }).toList();
+        List<BaseProductGetListDto> target = getBaseProductGetListDto(baseProductList);
         return new PageableData<BaseProductGetListDto>(
                 pageNum,
                 pageSize,
@@ -166,9 +157,30 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    private List<BaseProductGetListDto> getBaseProductGetListDto(List<BaseProduct> baseProductList) {
+        List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
+            Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
+            List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
+
+            float averageRating = getAverageRating(reviews);
+            long soldNum = 0 ;
+
+            Optional<Product> defaultProduct = baseProduct.getProducts().stream().filter(product1 -> product1.isDefault()).findFirst();
+            if (defaultProduct.isPresent())  {
+                Long soldNumRes = orderFeignClient.getSoldNumByProduct(defaultProduct.get().getId()).getBody();
+                soldNum = soldNumRes == null ? 0L : soldNumRes;
+            }
+            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
+        }).toList();
+        return target;
+    }
+
     @Override
     public BaseProductDto getBySlug(String slug) {
         BaseProduct baseProduct = baseProductRepository.findBySlug(slug).orElseThrow();
+        Integer categoryId = baseProduct.getCategory().getId();
+        List<BaseProduct> baseProductList = baseProductRepository.findByCategoryId(categoryId);
+        List<BaseProductGetListDto> relatedProducts = getBaseProductGetListDto(baseProductList);
         Long baseProductId = baseProduct.getId();
         List<ProductAttribute> productAttributes = productAttributeRepository.findByBaseProductId(baseProductId);
         List<ProductAttributeDto> productAttributeDtos =
@@ -180,25 +192,13 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDto> productVariants = getProductVariantsById(baseProductId);
         List<String> breadcrumb = getBreadcrumb(baseProduct.getCategory().getId(), baseProduct.getName());
         StoreDto storeDto = null;
-        return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb);
+        return BaseProductDto.fromModel(baseProduct, storeDto,productAttributeDtos  , productVariants, breadcrumb, relatedProducts);
     }
 
     @Override
     public List<BaseProductGetListDto> getByCategory(Integer categoryId) {
         List<BaseProduct> baseProductList = baseProductRepository.findByCategoryId(categoryId);
-        List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
-            Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
-            List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
-
-            float averageRating = getAverageRating(reviews);
-            long soldNum = 0 ;
-
-            Optional<Product> defaultProduct = baseProduct.getProducts().stream().filter(product1 -> product1.isDefault()).findFirst();
-            if (defaultProduct.isPresent())  {
-                soldNum = orderFeignClient.getSoldNumByProduct(defaultProduct.get().getId()).getBody();
-            }
-            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
-        }).toList();
+        List<BaseProductGetListDto> target = getBaseProductGetListDto(baseProductList);
         return target;
     }
 

@@ -1,4 +1,4 @@
-package com.siki.order.config;
+package com.payment.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +25,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus", "/actuator/health/**",
                                 "/swagger-ui", "/swagger-ui/**", "/error", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/storefront/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/storefront/**").hasAnyRole("CUSTOMER", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/storefront/**").hasRole("CUSTOMER")
-                        .requestMatchers("/sold-num/product/**").permitAll()
                         .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .csrf(AbstractHttpConfigurer::disable)

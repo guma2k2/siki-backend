@@ -1,12 +1,44 @@
+server:
+    port: 8085
+    servlet:
+        context-path: '/payments'
 spring:
     application:
-        name: payment
+        name: "payment"
+    datasource:
+        url: jdbc:mysql://localhost:3306/siki-payment
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        #    password: '01268797378Zx'
+        password: '123456789'
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: http://localhost:8880/realms/siki
+    instance:
+        preferIpAddress: true
+    client:
+        fetchRegistry: true
+        registerWithEureka: true
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka/
+info:
+    app:
+        name: "orders"
+        description: "Siki Payment Application"
+        version: "1.0.0"
+
 payment:
     vnPay:
         url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
         tmnCode: "EDT2E52Y"
         secretKey: "VGC6H4EJ834TXE5USIHM20W3FH4469VW"
-        returnUrl: "http://localhost:8080/payment/vn-pay-callback"
+        returnUrl: "http://localhost:8085/payments/vn-pay-callback"
         version: "2.1.0"
         command: "pay"
         orderType: "other"

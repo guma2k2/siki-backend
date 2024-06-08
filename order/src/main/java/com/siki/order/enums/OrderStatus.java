@@ -1,5 +1,5 @@
 package com.siki.order.enums;
 
 public enum OrderStatus {
-    PENDING, SHIPPING, SUCCESS
+    PENDING, SHIPPING, SUCCESS, CANCEL
 }
