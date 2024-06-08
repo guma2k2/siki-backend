@@ -58,7 +58,7 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
             select bp
             from BaseProduct bp
             join fetch bp.category c
-            where c.id = :id
+            where c.id = :categoryId
             """)
     List<BaseProduct> findByCategoryId(@Param("categoryId") Integer categoryId);
 }
