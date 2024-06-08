@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 public class ProductController {
@@ -37,6 +38,22 @@ public class ProductController {
     public ResponseEntity<BaseProductDto> getProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getById(id));
     }
+    @GetMapping(value =  "/storefront/product/{slug}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
+    public ResponseEntity<BaseProductDto> getProductById(@PathVariable("slug") String slug) {
+        return ResponseEntity.ok(productService.getBySlug(slug));
+    }
+
+    @GetMapping(value =  "/storefront/category/{categoryId}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
+    public ResponseEntity<List<BaseProductGetListDto>> getProductById(@PathVariable("categoryId") Integer categoryId) {
+        return ResponseEntity.ok(productService.getByCategory(categoryId));
+    }
+
     @GetMapping("/storefront/products-variant/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),

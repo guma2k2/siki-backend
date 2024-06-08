@@ -34,9 +34,31 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
    Page<BaseProduct> findByCategoryBrand(@Param("categoryName") String categoryName,
                                          @Param("brandNames") String[] brandNames,
                                          Pageable pageable
+
    );
 
+    @Query("""
+            select bp
+            from BaseProduct bp
+            where bp.name = :name
+            """)
+   Optional<BaseProduct> findByName(@Param("name") String name);
 
 
+    @Query("""
+            select bp
+            from BaseProduct bp
+            join fetch bp.brand
+            join fetch bp.category
+            where bp.slug = :slug
+            """)
+    Optional<BaseProduct> findBySlug(@Param("slug") String slug);
 
+    @Query("""
+            select bp
+            from BaseProduct bp
+            join fetch bp.category c
+            where c.id = :id
+            """)
+    List<BaseProduct> findByCategoryId(@Param("categoryId") Integer categoryId);
 }

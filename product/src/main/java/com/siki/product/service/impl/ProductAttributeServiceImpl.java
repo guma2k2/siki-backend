@@ -35,7 +35,8 @@ public class ProductAttributeServiceImpl implements ProductAttributeService {
             productAttributePostDto.productAttributeValues().forEach(item -> {
                 ProductAttributeValue productAttributeValue = ProductAttributeValue.builder()
                         .productAttribute(productAttribute)
-                        .value(item)
+                        .value(item.value())
+                        .image(item.image())
                         .build();
                 productAttributeValues.add(productAttributeValue);
             });
