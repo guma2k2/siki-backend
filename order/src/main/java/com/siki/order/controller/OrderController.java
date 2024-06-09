@@ -33,7 +33,7 @@ public class OrderController {
         List<OrderDto> orderDtos = orderService.findAllByUserId();
         return ResponseEntity.ok().body(orderDtos);
     }
-    @GetMapping("/storefront/sold-num/product/{productId}")
+    @GetMapping("/sold-num/product/{productId}")
     public ResponseEntity<Long> getSoldNumByProduct(
             @PathVariable("productId") Long productId
     ) {

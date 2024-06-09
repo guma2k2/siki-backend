@@ -31,14 +31,14 @@ public class ProductController {
         backoffice: admin
     */
 
-    @GetMapping(value = {"/backoffice/products/{id}", "/storefront/products/{id}"})
+    @GetMapping(value = {"/backoffice/product/{id}", "/storefront/product/{id}"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     public ResponseEntity<BaseProductDto> getProductById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(productService.getById(id));
     }
-    @GetMapping(value =  "/storefront/product/{slug}")
+    @GetMapping(value =  "/storefront/{slug}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})

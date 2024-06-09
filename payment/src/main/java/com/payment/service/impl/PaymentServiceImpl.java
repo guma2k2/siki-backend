@@ -2,6 +2,10 @@ package com.payment.service.impl;
 
 import com.payment.config.VNPayConfig;
 import com.payment.dto.PaymentDto;
+import com.payment.dto.PaymentPostDto;
+import com.payment.dto.PaymentRequestDto;
+import com.payment.model.Payment;
+import com.payment.repository.PaymentRepository;
 import com.payment.service.PaymentService;
 import com.payment.utils.VNPayUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,16 +18,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final VNPayConfig vnPayConfig;
+
+    private final PaymentRepository paymentRepository;
     @Override
-    public PaymentDto.VNPayResponse createVNPayPayment(HttpServletRequest request) {
-        long amount = Integer.parseInt(request.getParameter("amount")) * 100L;
-        String bankCode = request.getParameter("bankCode");
-        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
+    public PaymentDto.VNPayResponse createVNPayPayment(PaymentRequestDto request, HttpServletRequest httpServletRequest) {
+        long amount = request.amount() * 100L;
+        String bankCode = request.bankCode();
+        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig(request);
         vnpParamsMap.put("vnp_Amount", String.valueOf(amount));
         if (bankCode != null && !bankCode.isEmpty()) {
             vnpParamsMap.put("vnp_BankCode", bankCode);
         }
-        vnpParamsMap.put("vnp_IpAddr", VNPayUtils.getIpAddress(request));
+        vnpParamsMap.put("vnp_IpAddr", VNPayUtils.getIpAddress(httpServletRequest));
         //build query url
         String queryUrl = VNPayUtils.getPaymentURL(vnpParamsMap, true);
         String hashData = VNPayUtils.getPaymentURL(vnpParamsMap, false);
@@ -33,5 +39,19 @@ public class PaymentServiceImpl implements PaymentService {
                 .code("ok")
                 .message("success")
                 .paymentUrl(paymentUrl).build();
+    }
+
+    @Override
+    public void savePayment(PaymentPostDto request) {
+        Payment payment = Payment.builder()
+                .bankTranNo(request.bankTranNo())
+                .payDate(request.payDate())
+                .orderId(request.orderId())
+                .amount(request.amount())
+                .cartType(request.cartType())
+                .bankCode(request.bankCode())
+                .build();
+        paymentRepository.save(payment);
+        // Todo : update order Status to success
     }
 }

@@ -28,7 +28,7 @@ public class CategoryController {
 
     @PostMapping(value = "/backoffice/category")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Created"),
+            @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
     public ResponseEntity<Void> createCategory(@Valid @RequestBody CategoryPostDto categoryPostDto) {
@@ -46,7 +46,7 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryDto);
     }
 
-    @GetMapping
+    @GetMapping("/category")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CategoryListDto[].class))),
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
@@ -56,6 +56,16 @@ public class CategoryController {
         return ResponseEntity.ok().body(categoryListDtos);
     }
 
+
+    @GetMapping("/category/parents")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CategoryListDto[].class))),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
+    })
+    public ResponseEntity<List<CategoryDto>> getCategoryParents() {
+        List<CategoryDto> allCategoryParents = categoryService.getAllCategoryParents();
+        return ResponseEntity.ok().body(allCategoryParents);
+    }
 
     @GetMapping("/category/{name}")
     public ResponseEntity<CategoryGetDto> listCategoryByName(

@@ -17,13 +17,15 @@ public record BaseProductDto (
         StoreDto store,
         List<ProductAttributeDto> productAttributes,
         List<ProductDto> productVariants,
+        List<BaseProductGetListDto> relatedProducts,
         List<String> breadcrumb
 ) {
     public static BaseProductDto fromModel(BaseProduct baseProduct,
                                            StoreDto store,
                                            List<ProductAttributeDto> productAttributes,
                                            List<ProductDto> productVariants,
-                                           List<String> breadcrumb
+                                           List<String> breadcrumb,
+                                           List<BaseProductGetListDto> relatedProducts
     ) {
         BrandDto brand = BrandDto.fromModel(baseProduct.getBrand());
         CategoryDto category = CategoryDto.fromModel(baseProduct.getCategory());
@@ -37,6 +39,7 @@ public record BaseProductDto (
                 store,
                 productAttributes,
                 productVariants,
+                relatedProducts,
                 breadcrumb
         );
     }
