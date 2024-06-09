@@ -26,7 +26,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus", "/actuator/health/**",
-                                "/swagger-ui", "/swagger-ui/**", "/error", "/v3/api-docs/**").permitAll()
+                                "/swagger-ui", "/swagger-ui/**", "/error", "/v3/api-docs/**", "/api/users/storefront/signup").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/api/storefront/customer").hasRole("CUSTOMER")
                         .requestMatchers("/storefront/customer/profile").hasRole("CUSTOMER")
                         .anyRequest().permitAll())
