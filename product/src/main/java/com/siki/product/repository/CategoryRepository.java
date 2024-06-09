@@ -32,14 +32,14 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             select c
             from Category c
             left join fetch c.parent
-            where c.parent = null
+            where c.parent is null
             """)
     List<Category> findCategoryParents();
 
     @Query("""
             select c
             from Category c
-            left join fetch c.parent
+            left join fetch c.childrenList
             where c.parent.id = :id
             """)
     List<Category> findByParentId(@Param("id") Integer id);
