@@ -1,15 +1,11 @@
 package com.siki.product.service.impl;
 
-import com.siki.product.dto.category.CategoryDto;
-import com.siki.product.dto.category.CategoryGetDto;
-import com.siki.product.dto.category.CategoryListDto;
-import com.siki.product.dto.category.CategoryPostDto;
-import com.siki.product.dto.product.BaseProductGetListDto;
+import com.siki.product.dto.category.*;
 import com.siki.product.exception.DuplicatedException;
-import com.siki.product.exception.NotFoundException;
 import com.siki.product.model.BaseProduct;
 import com.siki.product.model.Brand;
 import com.siki.product.model.Category;
+import com.siki.product.repository.BaseProductRepository;
 import com.siki.product.repository.CategoryRepository;
 import com.siki.product.service.CategoryService;
 import org.springframework.stereotype.Service;
@@ -20,9 +16,11 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final BaseProductRepository baseProductRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, BaseProductRepository baseProductRepository) {
         this.categoryRepository = categoryRepository;
+        this.baseProductRepository = baseProductRepository;
     }
 
     @Override
@@ -49,9 +47,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto update(CategoryPostDto categoryPostDto, Integer categoryId) {
-        Category categoryFound = categoryRepository.findByName(categoryPostDto.name()).orElseThrow();
-        if (categoryFound != null)
+        Boolean isCategoryFound = categoryRepository.findByIdAndName(categoryId, categoryPostDto.name()).isPresent();
+        if (isCategoryFound)
             throw new DuplicatedException("Category name already exist");
+        Category categoryFound = categoryRepository.findById(categoryId).orElseThrow();
         categoryFound.setName(categoryPostDto.name());
         categoryFound.setImage(categoryPostDto.image());
         categoryFound.setDescription(categoryPostDto.description());
@@ -60,15 +59,28 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void delete(Integer categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElseThrow();
-        categoryRepository.delete(category);
+    public boolean delete(Integer categoryId) {
+        List<Category> categoryChildren = categoryRepository.findByParentId(categoryId);
+        if (baseProductRepository.findByCategoryId(categoryId).isEmpty() && categoryChildren.isEmpty()) {
+            Category category = categoryRepository.findById(categoryId).orElseThrow();
+            categoryRepository.delete(category);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     @Override
     public List<CategoryDto> getAllCategoryParents() {
         List<Category> categoryList = categoryRepository.findCategoryParents();
         return categoryList.stream().map(CategoryDto::fromModel).toList();
+    }
+
+    @Override
+    public List<CategoryAdminDto> getAllCategoryDto() {
+        List<Category> categoryList = categoryRepository.findAll();
+        return categoryList.stream().map(CategoryAdminDto::fromModel).toList();
     }
 
     @Override
@@ -81,7 +93,12 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryListDto> listAllToListDto() {
         List<Category> categoryList = categoryRepository.findAll();
         List<CategoryListDto> categoryListDto = categoryList.stream().map(c -> {
-            String parentName = c.getParent().getName();
+            String parentName;
+            if (c.getParent() == null) {
+                parentName = null;
+            } else {
+                parentName = c.getParent().getName();
+            }
             List<Category> childrenList = c.getChildrenList();
             return CategoryListDto.fromModel(c, parentName, childrenList);
         }).toList();
