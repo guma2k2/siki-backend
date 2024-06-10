@@ -40,6 +40,16 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     void updateSelected(@Param("cartId") Long cartId,
                         @Param("selected") boolean selected);
 
+
+    @Query("""
+            UPDATE Cart c
+            SET c.selected = :selected
+            WHERE c.userId = :userId
+            """)
+    @Modifying
+    void updateSelected(@Param("userId") String customerId,
+                        @Param("selected") boolean selected);
+
     @Query("""
             delete from Cart c
             where c.id = :cartId

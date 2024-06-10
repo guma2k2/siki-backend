@@ -1,11 +1,13 @@
 package com.siki.order.controller;
 
 import com.siki.order.dto.OrderDto;
+import com.siki.order.dto.OrderGetListDto;
 import com.siki.order.dto.OrderPostDto;
 import com.siki.order.enums.OrderStatus;
 import com.siki.order.service.OrderDetailService;
 import com.siki.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,9 +25,9 @@ public class OrderController {
     }
 
     @PostMapping("/storefront")
-    public ResponseEntity<Void> createOrder(@RequestBody OrderPostDto orderPostDto) {
-        orderService.createOrder(orderPostDto);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Long> createOrder(@RequestBody OrderPostDto orderPostDto) {
+        Long orderId = orderService.createOrder(orderPostDto);
+        return ResponseEntity.ok().body(orderId);
     }
 
     @GetMapping("/storefront")
@@ -33,6 +35,25 @@ public class OrderController {
         List<OrderDto> orderDtos = orderService.findAllByUserId();
         return ResponseEntity.ok().body(orderDtos);
     }
+
+    @GetMapping("/storefront/{orderId}")
+    public ResponseEntity<OrderDto> findById(@PathVariable("orderId") Long orderId) {
+        OrderDto orderDto = orderService.findById(orderId);
+        return ResponseEntity.ok().body(orderDto);
+    }
+    @GetMapping("/backoffice")
+    public ResponseEntity<List<OrderGetListDto>> findAll() {
+        List<OrderGetListDto> orderDtos = orderService.findAll();
+        return ResponseEntity.ok().body(orderDtos);
+    }
+
+    @GetMapping("/backoffice/status/{orderStatus}")
+    public ResponseEntity<List<OrderGetListDto>> findAllByStatus(@PathVariable("orderStatus") OrderStatus orderStatus) {
+        List<OrderGetListDto> orderDtos = orderService.findAllByStatus(orderStatus);
+        return ResponseEntity.ok().body(orderDtos);
+    }
+
+
     @GetMapping("/sold-num/product/{productId}")
     public ResponseEntity<Long> getSoldNumByProduct(
             @PathVariable("productId") Long productId
@@ -42,7 +63,7 @@ public class OrderController {
 
     @GetMapping("/storefront/status/{orderStatus}")
     public ResponseEntity<List<OrderDto>> findAllByUserIdAndStatus(
-            @RequestParam OrderStatus orderStatus
+            @PathVariable("orderStatus") OrderStatus orderStatus
     ) {
         List<OrderDto> orderDtos = orderService.findAllByUserAndStatus(orderStatus);
         return ResponseEntity.ok().body(orderDtos);
@@ -50,7 +71,7 @@ public class OrderController {
     @PutMapping("/storefront/{orderId}/status/{orderStatus}")
     public ResponseEntity<Void> updateStatusOrderById(
             @PathVariable("orderId") Long orderId,
-            @RequestParam OrderStatus orderStatus
+            @PathVariable("orderStatus") OrderStatus orderStatus
     ) {
         orderService.updateStatusOrderById(orderId, orderStatus);
         return ResponseEntity.noContent().build();

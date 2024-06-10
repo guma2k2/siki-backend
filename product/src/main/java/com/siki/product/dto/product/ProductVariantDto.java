@@ -9,6 +9,7 @@ public record ProductVariantDto(
         Long id,
         String name,
         String image,
+        int quantity,
         Double price,
         List<String> productAttributeValues,
         StoreDto store
@@ -17,6 +18,7 @@ public record ProductVariantDto(
         return  new ProductVariantDto(product.getId(),
                 product.getBaseProduct().getName(),
                 product.getImage(),
+                product.getQuantity(),
                 product.getPrice(),
                 productAttributeValues, store);
     }

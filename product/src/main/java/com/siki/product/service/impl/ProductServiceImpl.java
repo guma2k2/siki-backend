@@ -160,6 +160,7 @@ public class ProductServiceImpl implements ProductService {
     private List<BaseProductGetListDto> getBaseProductGetListDto(List<BaseProduct> baseProductList) {
         List<BaseProductGetListDto> target = baseProductList.stream().map(baseProduct -> {
             Product product = productRepository.findByBaseProductIsDefaultId(baseProduct.getId()).orElseThrow();
+            Long productId = product.getId();
             List<Review> reviews = reviewRepository.findByBaseProductId(baseProduct.getId());
 
             float averageRating = getAverageRating(reviews);
@@ -170,7 +171,7 @@ public class ProductServiceImpl implements ProductService {
                 Long soldNumRes = orderFeignClient.getSoldNumByProduct(defaultProduct.get().getId()).getBody();
                 soldNum = soldNumRes == null ? 0L : soldNumRes;
             }
-            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum);
+            return BaseProductGetListDto.fromModel(baseProduct, product.getImage(), product.getPrice(), averageRating,soldNum, productId);
         }).toList();
         return target;
     }
