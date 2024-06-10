@@ -24,7 +24,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("""
             select c
             from Category c
-            where c.name = :name and (id != null or c.id != :id)
+            where c.name = :name and c.id != :id
             """)
     Optional<Category> findByIdAndName(@Param("id") Integer id, @Param("name") String name);
 
@@ -39,7 +39,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("""
             select c
             from Category c
-            left join fetch c.childrenList
             where c.parent.id = :id
             """)
     List<Category> findByParentId(@Param("id") Integer id);

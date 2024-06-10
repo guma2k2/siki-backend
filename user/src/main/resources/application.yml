@@ -38,4 +38,4 @@ keycloak:
   realm: 'siki'
   resource: 'admin-cli'
   credentials:
-    secret: ZOn1oJbVjDKCBwZvJvE5JkjZXQhnxELd
+    secret: zv1OHlZUnXC4rZvo8lXKqqvKyoTpuZqw
