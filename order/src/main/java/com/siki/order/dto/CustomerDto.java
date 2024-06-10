@@ -1,4 +1,4 @@
-package com.siki.product.dto;
+package com.siki.order.dto;
 
 public record CustomerDto(
         String id,

@@ -28,7 +28,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/storefront/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/storefront/**").hasAnyRole("CUSTOMER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/storefront/**").hasRole("CUSTOMER")
-                        .requestMatchers("/sold-num/product/**").permitAll()
+                        /*.requestMatchers("/backoffice/**").permitAll()*/
                         .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .csrf(AbstractHttpConfigurer::disable)

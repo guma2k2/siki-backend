@@ -11,9 +11,10 @@ public record UserDto (String id,
                        String address,
                        String avatar,
                        String phoneNumber,
-                       String dateOfBirth
+                       String dateOfBirth,
+                       String role
 ) {
-    public static UserDto fromUserRepresentation(UserRepresentation userRepresentation, User user) {
+    public static UserDto fromUserRepresentation(UserRepresentation userRepresentation, User user, String role) {
         return new UserDto(userRepresentation.getId(),
                 userRepresentation.getUsername(),
                 userRepresentation.getEmail(),
@@ -22,7 +23,8 @@ public record UserDto (String id,
                 user.getAddress(),
                 user.getAvatar(),
                 user.getPhoneNumber(),
-                user.getDateOfBirth().toString()
+                user.getDateOfBirth().toString(),
+                role
         );
     }
 }

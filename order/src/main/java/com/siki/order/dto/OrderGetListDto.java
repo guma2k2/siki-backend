@@ -2,13 +2,11 @@ package com.siki.order.dto;
 
 import com.siki.order.enums.OrderStatus;
 import com.siki.order.model.Order;
-import com.siki.order.model.OrderDetail;
 import com.siki.order.utils.DateFormatter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-public record OrderDto(
+public record OrderGetListDto(
          Long id,
          String receiverPhoneNumber,
          String receiverAddress,
@@ -16,16 +14,19 @@ public record OrderDto(
          String note,
          String createdAt,
          OrderStatus status,
-         List<OrderDetailDto> orderDetails
+         List<OrderDetailDto> orderDetails,
+         CustomerDto customer
 ) {
-    public static OrderDto fromModel(Order order, List<OrderDetailDto> orderDetails) {
-        return new OrderDto(order.getId(),
+    public static OrderGetListDto fromModel(Order order, List<OrderDetailDto> orderDetails, CustomerDto customer) {
+        return new OrderGetListDto(order.getId(),
                 order.getReceiverPhoneNumber(),
                 order.getReceiverAddress(),
                 order.getReceiverName(),
                 order.getNote(),
                 DateFormatter.convertLocalDateTime(order.getCreatedAt()),
                 order.getStatus(),
-                orderDetails);
+                orderDetails,
+                customer
+        );
     }
 }

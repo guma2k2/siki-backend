@@ -7,6 +7,7 @@ import com.siki.order.model.OrderDetail;
 import com.siki.order.repository.OrderDetailRepository;
 import com.siki.order.repository.OrderRepository;
 import com.siki.order.service.OrderService;
+import com.siki.order.service.client.CustomerFeignClient;
 import com.siki.order.service.client.ProductFeignClient;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,20 +25,25 @@ public class OrderServiceImpl implements OrderService {
 
     private final ProductFeignClient productFeignClient;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ProductFeignClient productFeignClient) {
+    private final CustomerFeignClient customerFeignClient;
+    public OrderServiceImpl(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository, ProductFeignClient productFeignClient, CustomerFeignClient customerFeignClient) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.productFeignClient = productFeignClient;
+        this.customerFeignClient = customerFeignClient;
     }
 
     @Override
-    public void createOrder(OrderPostDto orderPostDto) {
+    public Long createOrder(OrderPostDto orderPostDto) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         Order order = Order.builder()
                 .note(orderPostDto.note())
                 .receiverAddress(orderPostDto.receiverAddress())
                 .receiverName(orderPostDto.receiverName())
                 .receiverPhoneNumber(orderPostDto.receiverPhoneNumber())
                 .status(OrderStatus.PENDING)
+                .userId(userId)
                 .createdAt(LocalDateTime.now())
                 .build();
         Order savedOrder = orderRepository.saveAndFlush(order);
@@ -53,16 +59,35 @@ public class OrderServiceImpl implements OrderService {
             orderDetails.add(orderDetail);
         }
         orderDetailRepository.saveAll(orderDetails);
+        return savedOrder.getId();
     }
 
     @Override
-    public List<OrderDto> findAll() {
-        return null;
+    public List<OrderGetListDto> findAll() {
+        List<Order> orders = orderRepository.findAllCustom();
+        List<OrderGetListDto> orderDtos = orders.stream().map(order -> {
+            CustomerDto customerDto = customerFeignClient.getCustomerById(order.getUserId()).getBody();
+            List<OrderDetailDto> orderDetailDtos = order.getOrderDetails().stream().map(orderDetail -> {
+                Long productId = orderDetail.getProductId();
+                ProductVariantDto productVariantDto = productFeignClient.getByProductId(productId).getBody();
+                return OrderDetailDto.fromModel(orderDetail, productVariantDto);
+            }).toList();
+            return OrderGetListDto.fromModel(order, orderDetailDtos, customerDto);
+        }).toList();
+        return orderDtos;
     }
 
     @Override
     public OrderDto findById(Long orderId) {
-        return null;
+        Order order = orderRepository.findById(orderId).orElseThrow();
+
+        List<OrderDetailDto> orderDetailDtos = order.getOrderDetails().stream().map(orderDetail -> {
+            Long productId = orderDetail.getProductId();
+            ProductVariantDto productVariantDto = productFeignClient.getByProductId(productId).getBody();
+            return OrderDetailDto.fromModel(orderDetail, productVariantDto);
+        }).toList();
+
+        return OrderDto.fromModel(order, orderDetailDtos);
     }
 
     @Override
@@ -99,5 +124,20 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateStatusOrderById(Long orderId, OrderStatus orderStatus) {
         orderRepository.updateStatusById(orderId, orderStatus   );
+    }
+
+    @Override
+    public List<OrderGetListDto> findAllByStatus(OrderStatus orderStatus) {
+        List<Order> orders = orderRepository.findAllByStatus(orderStatus);
+        List<OrderGetListDto> orderDtos = orders.stream().map(order -> {
+            CustomerDto customerDto = customerFeignClient.getCustomerById(order.getUserId()).getBody();
+            List<OrderDetailDto> orderDetailDtos = order.getOrderDetails().stream().map(orderDetail -> {
+                Long productId = orderDetail.getProductId();
+                ProductVariantDto productVariantDto = productFeignClient.getByProductId(productId).getBody();
+                return OrderDetailDto.fromModel(orderDetail, productVariantDto);
+            }).toList();
+            return OrderGetListDto.fromModel(order, orderDetailDtos, customerDto);
+        }).toList();
+        return orderDtos;
     }
 }
