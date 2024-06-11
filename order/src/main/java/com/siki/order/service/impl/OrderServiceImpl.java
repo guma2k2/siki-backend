@@ -123,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void updateStatusOrderById(Long orderId, OrderStatus orderStatus) {
-        orderRepository.updateStatusById(orderId, orderStatus   );
+        orderRepository.updateStatusById(orderId, orderStatus);
     }
 
     @Override

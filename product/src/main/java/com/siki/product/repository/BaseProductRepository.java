@@ -78,4 +78,14 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
             """)
     List<BaseProduct> findAllCustom();
 
+
+    @Query("""
+        select bp
+        from BaseProduct bp
+        join fetch bp.brand
+        join fetch bp.category
+        where bp.name like %:text%
+        """)
+    List<BaseProduct> findByNameCustom(@Param("text")String text);
+
 }

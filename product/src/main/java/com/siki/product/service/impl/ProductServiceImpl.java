@@ -217,6 +217,12 @@ public class ProductServiceImpl implements ProductService {
         return getBaseProductGetListDto(recommendProducts);
     }
 
+    @Override
+    public List<BaseProductGetListDto> getByName(String name) {
+        List<BaseProduct> baseProductList = baseProductRepository.findByNameCustom(name);
+        return getBaseProductGetListDto(baseProductList);
+    }
+
     private float getAverageRating(List<Review> reviews) {
         return Math.round((float) reviews.stream().mapToInt(review -> review.getRatingStar()).sum() / reviews.size());
     }

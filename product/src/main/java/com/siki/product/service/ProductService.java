@@ -20,4 +20,6 @@ public interface ProductService {
 
 
     List<BaseProductGetListDto> getRecommendProducts(int limit);
+
+    List<BaseProductGetListDto> getByName(String name);
 }

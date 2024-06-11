@@ -56,6 +56,15 @@ public class ProductController {
         return ResponseEntity.ok(productService.getByCategory(categoryId));
     }
 
+    @GetMapping(value =  "/text/{text}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
+    public ResponseEntity<List<BaseProductGetListDto>> getByText(@PathVariable("text") String text) {
+        return ResponseEntity.ok(productService.getByName(text));
+    }
+
+
     @GetMapping(value =  "/storefront/recommend-products")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),

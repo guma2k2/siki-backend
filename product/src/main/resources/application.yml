@@ -11,10 +11,7 @@ spring:
     username: root
 #    password: '01268797378Zx'
 #    password: '123456789'
-#     password: 'password'
-=======
-    password: '01268797378Zx'
-#    password: '123456789'
+    password: 'password'
   jpa:
     hibernate:
       ddl-auto: update
