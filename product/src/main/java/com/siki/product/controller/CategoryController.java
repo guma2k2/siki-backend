@@ -15,6 +15,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin("*")
 public class CategoryController {
 
     private final CategoryService categoryService;
