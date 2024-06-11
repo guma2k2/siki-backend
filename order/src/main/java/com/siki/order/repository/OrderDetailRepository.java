@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 
@@ -19,4 +21,14 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
             group by o.productId
             """)
     Long getSoldNumByProduct(@Param("productId") Long productId, @Param("status")OrderStatus status);
+
+    @Query("""
+            SELECT od.productId
+            FROM OrderDetail od
+            GROUP BY od.productId 
+            ORDER BY SUM(od.quantity) DESC
+            """)
+    List<Long> findTopProductsByQuantity();
+
+
 }

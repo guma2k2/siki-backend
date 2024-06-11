@@ -9,7 +9,7 @@ spring:
     url: jdbc:mysql://localhost:3306/siki-cart
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: '123456789'
+    password: 'password'
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,7 +18,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8880/realms/siki
+          issuer-uri: http://192.168.1.55:8880/realms/siki
   instance:
     preferIpAddress: true
   client:

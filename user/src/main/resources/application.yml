@@ -9,6 +9,9 @@ spring:
     url: jdbc:mysql://localhost:3306/siki-user
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
+#    password: '01268797378Zx'
+#    password: '123456789'
+#     password: "password"
     password: '01268797378Zx'
 #    password: '123456789'
   jpa:
@@ -19,7 +22,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8880/realms/siki
+          issuer-uri: http://192.168.1.55:8880/realms/siki
   instance:
     preferIpAddress: true
   client:
@@ -34,8 +37,9 @@ info:
     version: "1.0.0"
 
 keycloak:
-  auth-server-url: http://localhost:8880
+  auth-server-url: http://192.168.1.55:8880
   realm: 'siki'
   resource: 'admin-cli'
   credentials:
-    secret: zv1OHlZUnXC4rZvo8lXKqqvKyoTpuZqw
+    secret: FzMlLCjx1HOR55WbN66SVpg45vNzHZ6F
+

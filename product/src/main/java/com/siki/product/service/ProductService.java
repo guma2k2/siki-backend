@@ -17,4 +17,7 @@ public interface ProductService {
     BaseProductDto getBySlug(String slug);
 
     List<BaseProductGetListDto> getByCategory(Integer categoryId);
+
+
+    List<BaseProductGetListDto> getRecommendProducts(int limit);
 }

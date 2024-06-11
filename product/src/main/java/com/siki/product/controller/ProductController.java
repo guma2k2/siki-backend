@@ -23,6 +23,8 @@ public class ProductController {
 
     private final ProductService productService;
 
+    private static final int LIMIT_RECOMMEND_SIZE = 5;
+
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
@@ -52,6 +54,14 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     public ResponseEntity<List<BaseProductGetListDto>> getProductById(@PathVariable("categoryId") Integer categoryId) {
         return ResponseEntity.ok(productService.getByCategory(categoryId));
+    }
+
+    @GetMapping(value =  "/storefront/recommend-products")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(schema = @Schema(implementation = ProductDto.class))),
+            @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
+    public ResponseEntity<List<BaseProductGetListDto>> getRecommendProducts() {
+        return ResponseEntity.ok(productService.getRecommendProducts(LIMIT_RECOMMEND_SIZE));
     }
 
     @GetMapping("/storefront/products-variant/{id}")
@@ -85,5 +95,8 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    // Todo : update quantity, get relatedProduct, get product multi query
+
+
+
+    // Todo : update quantity
 }

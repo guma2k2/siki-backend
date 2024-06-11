@@ -3,6 +3,7 @@ package com.siki.order.controller;
 import com.siki.order.dto.OrderDto;
 import com.siki.order.dto.OrderGetListDto;
 import com.siki.order.dto.OrderPostDto;
+import com.siki.order.dto.ProductVariantDto;
 import com.siki.order.enums.OrderStatus;
 import com.siki.order.service.OrderDetailService;
 import com.siki.order.service.OrderService;
@@ -34,6 +35,12 @@ public class OrderController {
     public ResponseEntity<List<OrderDto>> findAllByUserId() {
         List<OrderDto> orderDtos = orderService.findAllByUserId();
         return ResponseEntity.ok().body(orderDtos);
+    }
+
+    @GetMapping("/10-beseller-products")
+    public ResponseEntity<List<ProductVariantDto>> get10BestSellerProducts() {
+        List<ProductVariantDto> productVariantDtos = orderDetailService.getTopProductBestSeller(10);
+        return ResponseEntity.ok().body(productVariantDtos);
     }
 
     @GetMapping("/storefront/{orderId}")
