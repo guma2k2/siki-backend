@@ -30,7 +30,7 @@ public class CategoryController {
     })
     public ResponseEntity<Void> createCategory(@Valid @RequestBody CategoryPostDto categoryPostDto) {
         categoryService.create(categoryPostDto);
-        return  ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/backoffice/category/{id}")
@@ -79,6 +79,13 @@ public class CategoryController {
             @PathVariable("name") String name
     ) {
         return ResponseEntity.ok().body(categoryService.listByName(name));
+    }
+
+    @GetMapping("/category/name/{id}")
+    public ResponseEntity<CategoryDto> findByIdReturnName(
+            @PathVariable("id") Integer id
+    ) {
+        return ResponseEntity.ok().body(categoryService.getById(id));
     }
 
     @DeleteMapping("/backoffice/category/{id}")
