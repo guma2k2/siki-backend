@@ -3,6 +3,9 @@ package com.siki.product.controller;
 import com.siki.product.dto.ErrorDto;
 import com.siki.product.dto.brand.BrandDto;
 import com.siki.product.dto.brand.BrandPostDto;
+import com.siki.product.dto.category.CategoryAdminDto;
+import com.siki.product.dto.category.CategoryListDto;
+import com.siki.product.model.Brand;
 import com.siki.product.service.BrandService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class BrandController {
@@ -46,8 +51,20 @@ public class BrandController {
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
     })
     public ResponseEntity<Void> deletedBrand(@PathVariable Integer id) {
-        brandService.delete(id);
-        return ResponseEntity.noContent().build();
+        if (brandService.delete(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("/brand/all")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = BrandDto[].class))),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorDto.class)))
+    })
+    public ResponseEntity<List<BrandDto>> getAllBrands() {
+        List<BrandDto> brandDtos = brandService.getAllBrands();
+        return ResponseEntity.ok().body(brandDtos);
     }
 
 }
