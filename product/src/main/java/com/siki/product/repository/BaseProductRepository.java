@@ -69,4 +69,13 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
             where c.id = :categoryId
             """)
     List<BaseProduct> findByCategoryId(@Param("categoryId") Integer categoryId);
+
+    @Query("""
+            select bp
+            from BaseProduct bp
+            join fetch bp.brand
+            join fetch bp.category
+            """)
+    List<BaseProduct> findAllCustom();
+
 }

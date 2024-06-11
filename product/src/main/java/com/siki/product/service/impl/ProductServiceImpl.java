@@ -10,6 +10,7 @@ import com.siki.product.service.ProductService;
 import com.siki.product.service.client.OrderFeignClient;
 import com.siki.product.utils.Constants;
 import com.siki.product.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
@@ -201,6 +203,18 @@ public class ProductServiceImpl implements ProductService {
         List<BaseProduct> baseProductList = baseProductRepository.findByCategoryId(categoryId);
         List<BaseProductGetListDto> target = getBaseProductGetListDto(baseProductList);
         return target;
+    }
+
+    @Override
+    public List<BaseProductGetListDto> getRecommendProducts(int limit) {
+        List<BaseProduct> baseProductList = baseProductRepository.findAllCustom();
+        log.info(baseProductList.size() + "");
+        if (limit > baseProductList.size()) {
+            limit = baseProductList.size() - 1 ;
+        }
+        Collections.shuffle(baseProductList, new Random());
+        List<BaseProduct> recommendProducts = baseProductList.subList(0, limit);
+        return getBaseProductGetListDto(recommendProducts);
     }
 
     private float getAverageRating(List<Review> reviews) {

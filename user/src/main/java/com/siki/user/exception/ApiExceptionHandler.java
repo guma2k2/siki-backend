@@ -32,6 +32,15 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(errorVm, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorDto> handleBadRequest(BadRequestException ex, WebRequest request) {
+        String message = ex.getMessage();
+        ErrorDto errorVm = new ErrorDto("400", "Bad request", message);
+       /* log.warn(ERROR_LOG_FORMAT, this.getServletPath(request), 400, message);
+        log.debug(ex.toString());*/
+        return new ResponseEntity<>(errorVm, HttpStatus.BAD_REQUEST);
+    }
+
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
         return servletRequest.getRequest().getServletPath();

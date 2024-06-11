@@ -54,6 +54,8 @@ public class CategoryServiceImpl implements CategoryService {
         categoryFound.setName(categoryPostDto.name());
         categoryFound.setImage(categoryPostDto.image());
         categoryFound.setDescription(categoryPostDto.description());
+
+
         if (categoryPostDto.categoryParentId() != null) {
             Category parent = categoryRepository.findById(categoryPostDto.categoryParentId()).orElseThrow();
             categoryFound.setParent(parent);
