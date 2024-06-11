@@ -49,6 +49,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void removeCartOfLoggedUser() {
         String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
         cartRepository.deleteCartByUser(customerId);
@@ -83,5 +84,12 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void updateSelected(Long cartId, boolean isSelected) {
         cartRepository.updateSelected(cartId, isSelected);
+    }
+
+    @Override
+    @Transactional
+    public void updateSelectedOfUser(boolean selection) {
+        String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        cartRepository.updateSelected(customerId, selection);
     }
 }

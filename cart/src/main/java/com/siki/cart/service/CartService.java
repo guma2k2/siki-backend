@@ -14,5 +14,6 @@ public interface CartService {
     List<CartDto> getCartsForCustomer(String customerId);
     void updateQuantity(Long CartId, int quantity);
     void updateSelected(Long cartId, boolean isSelected);
+    void updateSelectedOfUser(boolean selection);
 
 }

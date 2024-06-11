@@ -6,8 +6,10 @@ public record ProductVariantDto(
         Long id,
         String name,
         String image,
+        int quantity,
         Double price,
-        List<String> productAttributeValues
+        List<String> productAttributeValues,
+        StoreDto store
 ) {
 }
 

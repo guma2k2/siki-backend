@@ -30,6 +30,7 @@ public class Order {
 
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     private String userId;

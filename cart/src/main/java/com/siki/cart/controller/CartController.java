@@ -2,6 +2,7 @@ package com.siki.cart.controller;
 
 import com.siki.cart.dto.CartDto;
 import com.siki.cart.service.CartService;
+import jakarta.ws.rs.Path;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,12 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/storefront/selection/{selection}")
+    public ResponseEntity<Void> updateSlectionCart(@PathVariable("selection") boolean selection) {
+        cartService.updateSelectedOfUser(selection);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/storefront/products/{productId}")
     public ResponseEntity<CartDto> listCarts(
             @PathVariable("productId") Long productId
@@ -46,14 +53,14 @@ public class CartController {
 
     @PutMapping("/storefront/{cartId}/quantity/{quantity}")
     public ResponseEntity<Void> updateQuantity(@PathVariable("cartId") Long cartId,
-                                               @RequestParam("quantity") int quantity) {
+                                               @PathVariable("quantity") int quantity) {
         cartService.updateQuantity(cartId, quantity);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/storefront/selection/{cartId}")
+    @PutMapping("/storefront/{cartId}/selection/{selection}")
     public ResponseEntity<Void> updateSelection(@PathVariable("cartId") Long cartId,
-                                               @RequestParam("selection") boolean selection) {
+                                                @PathVariable("selection") boolean selection) {
         cartService.updateSelected(cartId, selection);
         return ResponseEntity.noContent().build();
     }

@@ -9,9 +9,10 @@ public record BaseProductGetListDto (
         String image,
         Double price,
         float averageRating,
-        long soldNum
+        long soldNum,
+        Long productId
 ) {
-    public static BaseProductGetListDto fromModel(BaseProduct baseProduct, String imgUrl, Double price, float averageRating, long soldNum){
-        return new BaseProductGetListDto(baseProduct.getId(), baseProduct.getName(), baseProduct.getSlug(), imgUrl, price, averageRating, soldNum);
+    public static BaseProductGetListDto fromModel(BaseProduct baseProduct, String imgUrl, Double price, float averageRating, long soldNum, Long productId){
+        return new BaseProductGetListDto(baseProduct.getId(), baseProduct.getName(), baseProduct.getSlug(), imgUrl, price, averageRating, soldNum, productId);
     }
 }

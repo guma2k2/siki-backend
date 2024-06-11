@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 @Service
 @Slf4j
@@ -36,6 +37,8 @@ public class UserServiceImpl implements UserService{
     @Value("${keycloak.resource}")
     private String adminClientId;
     private final static String CUSTOMER = "CUSTOMER";
+
+    private final static String ADMIN = "ADMIN";
     private final Keycloak keycloak;
     private final UserRepository userRepository;
 
@@ -94,7 +97,7 @@ public class UserServiceImpl implements UserService{
 
                 userResource.roles().realmLevel().add(Collections.singletonList(guestRealmRole));
 
-                return UserDto.fromUserRepresentation(user, customer);
+                return UserDto.fromUserRepresentation(user, customer, CUSTOMER);
             }
             return null;
         } catch (ForbiddenException ex) {
@@ -107,8 +110,29 @@ public class UserServiceImpl implements UserService{
     public UserDto getCustomerProfile(String customerId) {
         try {
             UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
+            /*List<String> realmRoles = userRepresentation.getRealmRoles();
+            S
+
+            log.info(realmRoles.toString());*/
+
+            List<String> roles = keycloak.realm(realm).users().get(customerId).roles().realmLevel().listEffective().stream()
+                    .map(roleRepresentation -> roleRepresentation.getName())
+                    .toList();
+            String role = null;
+            for (String r : roles) {
+                if (r.equals("ADMIN")) {
+                    role = "ADMIN";
+                    break; // Exit loop once role is set
+                } else if (r.equals("CUSTOMER")) {
+                    role = "CUSTOMER";
+                    // Continue checking in case the user has multiple roles and "ADMIN" is preferred
+                }
+            }
+            if (role == null) {
+                role = "";
+            }
             User user = userRepository.findById(customerId).orElseThrow();
-            return UserDto.fromUserRepresentation(userRepresentation, user);
+            return UserDto.fromUserRepresentation(userRepresentation, user, role);
         }catch (ForbiddenException ex) {
             throw new AccessDeniedException(String.format(Constants.ERROR_CODE.ACCESS_DENIED_ERROR_FORMAT,
                     ex.getMessage(), adminClientId));
@@ -144,7 +168,7 @@ public class UserServiceImpl implements UserService{
                 userResource.update(userRepresentation);
             }catch (BadRequestException ex) {
             }
-            return UserDto.fromUserRepresentation(userRepresentation, oldUser);
+            return UserDto.fromUserRepresentation(userRepresentation, oldUser, CUSTOMER);
         }  else {
             throw new RuntimeException();
         }
