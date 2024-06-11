@@ -14,12 +14,12 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8880/realms/siki
+            issuer-uri: http://192.168.1.55:8880/realms/siki
         registration:
           api-client:
             provider: keycloak
             client-id: siki-client
-            client-secret: fAWurn3u3FHKiDTt2KxsPwNPgzPzesC4
+            client-secret: BAdQw3ubmxeJeeGXLaX8nVjescrw6n80
             scope: openid, profile, email, roles
 management:
   endpoints:

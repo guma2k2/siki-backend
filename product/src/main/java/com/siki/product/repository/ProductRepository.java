@@ -48,4 +48,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """)
     Optional<Product> findByBaseProductIsDefaultId(@Param("baseProductId") Long baseProductId);
 
+
+
 }

@@ -10,7 +10,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
 #    password: '01268797378Zx'
-    password: '123456789'
+#    password: '123456789'
+    password: 'password'
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,7 +20,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8880/realms/siki
+          issuer-uri: http://192.168.1.55:8880/realms/siki
   instance:
     preferIpAddress: true
   client:

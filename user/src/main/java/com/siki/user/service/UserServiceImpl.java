@@ -4,11 +4,11 @@ import com.siki.user.dto.CustomerPostDto;
 import com.siki.user.dto.CustomerProfileRequest;
 import com.siki.user.dto.UserDto;
 import com.siki.user.exception.AccessDeniedException;
+import com.siki.user.exception.BadRequestException;
 import com.siki.user.model.User;
 import com.siki.user.repository.UserRepository;
 import com.siki.user.utils.Constants;
 import com.siki.user.utils.DateUtils;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -59,8 +59,19 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDto createCustomer(CustomerPostDto customerPostDto) {
         try {
-//           log.info(realm);
-            // Todo: check email is existed
+            if (customerPostDto.email().isBlank() || customerPostDto.email().isEmpty()) {
+                throw new BadRequestException("Email không được bỏ trống");
+            }
+
+            if (userRepository.findByEmail(customerPostDto.email()).isPresent()) {
+                throw new BadRequestException("Email đã tồn tại");
+            }
+
+            if (userRepository.findByPhoneNumber(customerPostDto.phoneNumber()).isPresent()) {
+                throw new BadRequestException("Sdt đã tồn tại");
+            }
+
+
             RealmResource resource = keycloak.realm(realm);
             CredentialRepresentation credential = createPasswordCredentials(customerPostDto.password());
             UserRepresentation user = new UserRepresentation();
@@ -87,6 +98,7 @@ public class UserServiceImpl implements UserService{
                         .firstName(customerPostDto.firstName())
                         .lastName(customerPostDto.lastName())
                         .address(customerPostDto.address())
+                        .email(customerPostDto.email())
                         .phoneNumber(customerPostDto.phoneNumber())
                         .dateOfBirth(DateUtils.convertToLocalDateTime(customerPostDto.dateOfBirth()))
                         .build();
@@ -143,34 +155,36 @@ public class UserServiceImpl implements UserService{
     public UserDto updateCustomer(CustomerProfileRequest customerProfileRequest) {
         String customerId = SecurityContextHolder.getContext().getAuthentication().getName();
         UserRepresentation userRepresentation = keycloak.realm(realm).users().get(customerId).toRepresentation();
+        if (customerProfileRequest.email() != null) {
+            if (customerProfileRequest.email() != userRepresentation.getEmail()) {
+                if (userRepository.findByEmail(customerProfileRequest.email()).isPresent()) {
+                    throw new BadRequestException("Email đã tồn tại");
+                }
+            }
+        }
         if (userRepresentation != null) {
             RealmResource resource = keycloak.realm(realm);
             UserResource userResource = resource.users().get(customerId);
-
             userRepresentation.setEmail(customerProfileRequest.email());
-            userRepresentation.setUsername(customerProfileRequest.username());
             User oldUser = userRepository.findById(customerId).orElseThrow();
-
             oldUser.setFirstName(customerProfileRequest.firstName());
             oldUser.setLastName(customerProfileRequest.lastName());
             oldUser.setAddress(customerProfileRequest.address());
             oldUser.setPhoneNumber(customerProfileRequest.phoneNumber());
-            oldUser.setAvatar(customerProfileRequest.avatar());
+            if (customerProfileRequest.avatar() != null && !customerProfileRequest.avatar().isBlank()) {
+                oldUser.setAvatar(customerProfileRequest.avatar());
+            }
             oldUser.setDateOfBirth(DateUtils.convertToLocalDateTime(customerProfileRequest.dateOfBirth()));
-
-
+            oldUser.setEmail(customerProfileRequest.email());
             userRepository.save(oldUser);
 
             if (customerProfileRequest.password() != null) {
                 userRepresentation.setCredentials(Collections.singletonList(createPasswordCredentials(customerProfileRequest.password())));
             }
-            try {
-                userResource.update(userRepresentation);
-            }catch (BadRequestException ex) {
-            }
+            userResource.update(userRepresentation);
             return UserDto.fromUserRepresentation(userRepresentation, oldUser, CUSTOMER);
         }  else {
-            throw new RuntimeException();
+            throw new BadRequestException("Khong the update user");
         }
     }
 }

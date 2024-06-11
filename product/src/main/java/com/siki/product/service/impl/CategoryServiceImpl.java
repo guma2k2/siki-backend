@@ -55,6 +55,8 @@ public class CategoryServiceImpl implements CategoryService {
         categoryFound.setName(categoryPostDto.name());
         categoryFound.setImage(categoryPostDto.image());
         categoryFound.setDescription(categoryPostDto.description());
+
+
         categoryRepository.saveAndFlush(categoryFound);
         return CategoryDto.fromModel(categoryFound);
     }
