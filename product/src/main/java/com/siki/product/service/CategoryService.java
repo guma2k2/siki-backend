@@ -1,9 +1,6 @@
 package com.siki.product.service;
 
-import com.siki.product.dto.category.CategoryDto;
-import com.siki.product.dto.category.CategoryGetDto;
-import com.siki.product.dto.category.CategoryListDto;
-import com.siki.product.dto.category.CategoryPostDto;
+import com.siki.product.dto.category.*;
 
 import java.util.List;
 
@@ -13,9 +10,10 @@ public interface CategoryService {
     
     CategoryDto update(CategoryPostDto categoryPostDto, Integer categoryId);
 
-    void delete(Integer categoryId);
+    boolean delete(Integer categoryId);
 
     List<CategoryDto> getAllCategoryParents();
+    List<CategoryAdminDto> getAllCategoryDto();
 
     CategoryDto getById(Integer categoryId);
 

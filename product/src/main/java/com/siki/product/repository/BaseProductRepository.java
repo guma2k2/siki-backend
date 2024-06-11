@@ -44,6 +44,14 @@ public interface BaseProductRepository extends JpaRepository<BaseProduct, Long> 
             """)
    Optional<BaseProduct> findByName(@Param("name") String name);
 
+    @Query("""
+            select bp
+            from BaseProduct bp
+            left join fetch bp.brand b
+            where b.id = :id
+            """)
+    List<BaseProduct> findByBrandId(@Param("id") Integer id);
+
 
     @Query("""
             select bp

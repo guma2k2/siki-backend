@@ -11,7 +11,9 @@ spring:
     username: root
 #    password: '01268797378Zx'
 #    password: '123456789'
-    password: "password"
+#     password: "password"
+    password: '01268797378Zx'
+#    password: '123456789'
   jpa:
     hibernate:
       ddl-auto: update
@@ -40,3 +42,4 @@ keycloak:
   resource: 'admin-cli'
   credentials:
     secret: FzMlLCjx1HOR55WbN66SVpg45vNzHZ6F
+
