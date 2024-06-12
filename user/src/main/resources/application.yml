@@ -20,7 +20,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://192.168.1.55:8880/realms/siki
+          issuer-uri: http://10.252.3.73:8880/realms/siki
   instance:
     preferIpAddress: true
   client:
@@ -35,7 +35,7 @@ info:
     version: "1.0.0"
 
 keycloak:
-  auth-server-url: http://192.168.1.55:8880
+  auth-server-url: http://10.252.3.73:8880
   realm: 'siki'
   resource: 'admin-cli'
   credentials:
